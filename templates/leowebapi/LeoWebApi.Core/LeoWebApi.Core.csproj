@@ -6,8 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="OneOf" Version="3.0.271" />
-    <PackageReference Update="NodaTime" Version="3.2.1" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.1" />
   </ItemGroup>
 
 </Project>
