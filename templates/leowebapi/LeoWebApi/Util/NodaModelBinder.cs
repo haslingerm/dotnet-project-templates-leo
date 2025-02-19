@@ -3,7 +3,17 @@ using NodaTime.Text;
 
 namespace LeoWebApi.Util;
 
-public sealed class LocalDateModelBinder : IModelBinder
+public sealed class NodaModelBinder : NodaTimeModelBinder<LocalDate>, IModelBinder
+{
+    protected override ParseResult<LocalDate> Parse(string dateString) => LocalDatePattern.Iso.Parse(dateString);
+}
+
+public sealed class InstantModelBinder : NodaTimeModelBinder<Instant>, IModelBinder
+{
+    protected override ParseResult<Instant> Parse(string dateString) => InstantPattern.ExtendedIso.Parse(dateString);
+}
+
+public abstract class NodaTimeModelBinder<T> : IModelBinder
 {
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {
@@ -22,7 +32,7 @@ public sealed class LocalDateModelBinder : IModelBinder
             return Task.CompletedTask;
         }
 
-        ParseResult<LocalDate> parseResult = LocalDatePattern.Iso.Parse(dateString);
+        ParseResult<T> parseResult = Parse(dateString);
         if (!parseResult.Success)
         {
             bindingContext.ModelState.TryAddModelError(bindingContext.ModelName, "Invalid date format");
@@ -34,12 +44,21 @@ public sealed class LocalDateModelBinder : IModelBinder
 
         return Task.CompletedTask;
     }
+
+    protected abstract ParseResult<T> Parse(string dateString);
 }
 
-public sealed class LocalDateModelBinderProvider : IModelBinderProvider
+public sealed class NodaTimeModelBinderProvider : IModelBinderProvider
 {
-    public IModelBinder? GetBinder(ModelBinderProviderContext context) =>
-        context.Metadata.ModelType == typeof(LocalDate)
-            ? new LocalDateModelBinder()
+    public IModelBinder? GetBinder(ModelBinderProviderContext context)
+    {
+        if (context.Metadata.ModelType == typeof(Instant))
+        {
+            return new InstantModelBinder();
+        }
+
+        return context.Metadata.ModelType == typeof(LocalDate)
+            ? new NodaModelBinder()
             : null;
+    }
 }

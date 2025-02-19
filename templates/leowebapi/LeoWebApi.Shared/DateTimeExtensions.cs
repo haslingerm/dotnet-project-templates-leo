@@ -7,7 +7,7 @@ public static class DateTimeExtensions
     public static LocalDateTime GetLocalDateTime(this IClock self) => self.GetLocalNow().LocalDateTime;
     public static LocalTime GetLocalTime(this IClock self) => self.GetLocalDateTime().TimeOfDay;
     public static LocalDate GetLocalDate(this IClock self) => self.GetLocalDateTime().Date;
-
+    public static Instant ToInstantInZone(this LocalDateTime self) => self.Date.ToInstantInZone(self.TimeOfDay);
     public static Instant ToInstantInZone(this LocalDate self, LocalTime? atTime = null)
     {
         var midnight = self.AtStartOfDayInZone(Const.TimeZone);

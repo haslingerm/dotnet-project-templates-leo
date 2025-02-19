@@ -16,7 +16,7 @@ builder.AddLogging();
 builder.Services.AddApplicationServices(configurationManager, isDev);
 builder.Services.AddOpenApi();
 builder.Services.AddCors(settings);
-builder.Services.AddControllers(o => { o.ModelBinderProviders.Insert(0, new LocalDateModelBinderProvider()); })
+builder.Services.AddControllers(o => { o.ModelBinderProviders.Insert(0, new NodaTimeModelBinderProvider()); })
        .AddJsonOptions(o => ConfigureJsonSerialization(o, isDev));
 builder.Services.ConfigureAdditionalRouteConstraints();
 
