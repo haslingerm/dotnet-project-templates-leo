@@ -25,7 +25,7 @@ var app = builder.Build();
 // not using HTTPS, because all production backends _have_ to be behind a reverse proxy which will handle SSL termination
 
 app.UseCors(Setup.CorsPolicyName);
-
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
