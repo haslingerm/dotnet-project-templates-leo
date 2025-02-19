@@ -17,6 +17,7 @@ public abstract class WebApiTestBase(WebApiTestFixture webApiFixture) : IClassFi
     protected static JsonSerializerOptions JsonOptions => jsonOptions.Value;
 
     protected HttpClient ApiClient => webApiFixture.Client;
+    protected IClock TestClock => webApiFixture.Clock;
 
     public async Task InitializeAsync()
     {

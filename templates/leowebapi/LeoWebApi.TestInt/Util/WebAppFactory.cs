@@ -12,6 +12,10 @@ internal sealed class WebAppFactory(string connectionString) : WebApplicationFac
 {
     public static readonly LocalDateTime CurrentDateTimeForTests = new(2025, 01, 01, 14, 30, 00);
     public IServiceProvider? ServiceProvider { get; private set; }
+    
+    public IClock TestClock =>
+        ServiceProvider?.GetService<IClock>() ??
+        throw new InvalidOperationException("Service provider not available or clock not registered");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

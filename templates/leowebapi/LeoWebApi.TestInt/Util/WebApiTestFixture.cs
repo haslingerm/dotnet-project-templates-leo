@@ -17,11 +17,18 @@ public sealed class WebApiTestFixture : IAsyncLifetime
 
     private HttpClient? _client;
     private WebAppFactory? _factory;
+    private IClock? _testClock;
 
     public HttpClient Client
     {
         get => _client ?? throw new InvalidOperationException("Client not created");
         private set => _client = value;
+    }
+    
+    public IClock Clock
+    {
+        get => _testClock ?? throw new InvalidOperationException("Clock not created");
+        private set => _testClock = value;
     }
 
     private WebAppFactory Factory
@@ -36,6 +43,7 @@ public sealed class WebApiTestFixture : IAsyncLifetime
 
         Factory = new WebAppFactory(_postgresContainer.GetConnectionString());
         Client = Factory.CreateClient();
+        Clock = Factory.TestClock;
     }
 
     public async Task DisposeAsync()

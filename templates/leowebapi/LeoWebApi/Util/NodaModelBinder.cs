@@ -3,12 +3,12 @@ using NodaTime.Text;
 
 namespace LeoWebApi.Util;
 
-public sealed class NodaModelBinder : NodaTimeModelBinder<LocalDate>, IModelBinder
+public sealed class NodaModelBinder : NodaTimeModelBinder<LocalDate>
 {
     protected override ParseResult<LocalDate> Parse(string dateString) => LocalDatePattern.Iso.Parse(dateString);
 }
 
-public sealed class InstantModelBinder : NodaTimeModelBinder<Instant>, IModelBinder
+public sealed class InstantModelBinder : NodaTimeModelBinder<Instant>
 {
     protected override ParseResult<Instant> Parse(string dateString) => InstantPattern.ExtendedIso.Parse(dateString);
 }
