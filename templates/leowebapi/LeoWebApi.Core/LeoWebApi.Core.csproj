@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\LeoWebApi.Persistence\LeoWebApi.Persistence.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\LeoWebApi.Persistence\LeoWebApi.Persistence.csproj"/>
+        <InternalsVisibleTo Include="LeoWebApi.Test"/>
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OneOf" Version="3.0.271" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="OneOf" Version="3.0.271"/>
+    </ItemGroup>
 
 </Project>
