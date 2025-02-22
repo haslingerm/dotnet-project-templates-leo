@@ -143,13 +143,13 @@ public sealed class RocketDto
     public double MaxThrust { get; set; }
     public long PayloadDeltaV { get; set; }
     
-    public static RocketDto FromRocket(Rocket self) =>
+    public static RocketDto FromRocket(Rocket rocket) =>
         new()
         {
-            Id = self.Id,
-            ModelName = self.ModelName,
-            Manufacturer = self.Manufacturer,
-            MaxThrust = self.MaxThrust,
-            PayloadDeltaV = self.PayloadDeltaV
+            Id = rocket.Id,
+            ModelName = rocket.ModelName,
+            Manufacturer = rocket.Manufacturer,
+            MaxThrust = rocket.MaxThrust,
+            PayloadDeltaV = rocket.PayloadDeltaV
         };
 }
