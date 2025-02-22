@@ -31,7 +31,7 @@ public sealed class RocketController(
 
         OneOf<Rocket, NotFound> rocketResult = await rocketService.GetRocketByIdAsync(id, false);
 
-        return rocketResult.Match<ActionResult<RocketDto>>(rocket => Ok(rocket.ToDto()),
+        return rocketResult.Match<ActionResult<RocketDto>>(rocket => Ok(RocketDto.FromRocket(rocket)),
                                                            notFound => NotFound());
     }
 
@@ -43,7 +43,7 @@ public sealed class RocketController(
 
         return Ok(new AllRocketsResponse
         {
-            Rockets = rockets.Select(r => r.ToDto()).ToList()
+            Rockets = rockets.Select(RocketDto.FromRocket).ToList()
         });
     }
 
@@ -68,7 +68,7 @@ public sealed class RocketController(
             return CreatedAtAction(nameof(GetRocketById), new
             {
                 rocket.Id
-            }, rocket.ToDto());
+            }, RocketDto.FromRocket(rocket));
         }
         catch (Exception ex)
         {
@@ -133,4 +133,23 @@ public sealed class AddRocketRequest
 public sealed class AllRocketsResponse
 {
     public required List<RocketDto> Rockets { get; set; }
+}
+
+public sealed class RocketDto
+{
+    public int Id { get; set; }
+    public required string ModelName { get; set; }
+    public required string Manufacturer { get; set; }
+    public double MaxThrust { get; set; }
+    public long PayloadDeltaV { get; set; }
+    
+    public static RocketDto FromRocket(Rocket self) =>
+        new()
+        {
+            Id = self.Id,
+            ModelName = self.ModelName,
+            Manufacturer = self.Manufacturer,
+            MaxThrust = self.MaxThrust,
+            PayloadDeltaV = self.PayloadDeltaV
+        };
 }

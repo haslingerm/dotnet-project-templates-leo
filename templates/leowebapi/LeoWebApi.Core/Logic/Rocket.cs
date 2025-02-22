@@ -4,22 +4,14 @@ namespace LeoWebApi.Core.Logic;
 
 public static class RocketExtensions
 {
-    public static RocketDto ToDto(this Rocket self) =>
-        new()
-        {
-            Id = self.Id,
-            ModelName = self.ModelName,
-            Manufacturer = self.Manufacturer,
-            MaxThrust = self.MaxThrust,
-            PayloadDeltaV = self.PayloadDeltaV
-        };
-}
+    private const double MinThrustToWeightRatio = 1.5D;
 
-public sealed class RocketDto
-{
-    public int Id { get; set; }
-    public required string ModelName { get; set; }
-    public required string Manufacturer { get; set; }
-    public double MaxThrust { get; set; }
-    public long PayloadDeltaV { get; set; }
+    public static (bool TakeoffPossible, double Ratio)
+        CalcThrustToWeightRatio(this Rocket self, double totalWeight)
+    {
+        double thrustToWeightRatio = self.MaxThrust / totalWeight;
+        bool takeoffPossible = thrustToWeightRatio >= MinThrustToWeightRatio;
+
+        return (takeoffPossible, thrustToWeightRatio);
+    }
 }

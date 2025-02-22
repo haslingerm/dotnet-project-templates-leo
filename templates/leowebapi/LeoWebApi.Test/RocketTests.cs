@@ -6,7 +6,7 @@ namespace LeoWebApi.Test;
 public sealed class RocketTests
 {
     [Fact]
-    public void ToDto_Success()
+    public void CalcThrustToWeightRatio_Success()
     {
         var rocket = new Rocket
         {
@@ -17,13 +17,9 @@ public sealed class RocketTests
             PayloadDeltaV = 36_000_000
         };
 
-        var dto = rocket.ToDto();
+        (bool takeoffPossible, double ratio) = rocket.CalcThrustToWeightRatio(800_000);
 
-        dto.Should().NotBeNull();
-        dto.Id.Should().Be(rocket.Id);
-        dto.ModelName.Should().Be(rocket.ModelName);
-        dto.Manufacturer.Should().Be(rocket.Manufacturer);
-        dto.MaxThrust.Should().Be(rocket.MaxThrust);
-        dto.PayloadDeltaV.Should().Be(rocket.PayloadDeltaV);
+        ratio.Should().Be(1.875D);
+        takeoffPossible.Should().BeTrue();
     }
 }

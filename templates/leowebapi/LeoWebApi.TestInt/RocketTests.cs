@@ -44,7 +44,7 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
         var content = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions);
 
         content.Should().NotBeNull();
-        content!.Rockets.Should().NotBeEmpty()
+        content.Rockets.Should().NotBeEmpty()
                 .And.HaveCount(2);
         content.Rockets.Should().ContainSingle(r => r.Manufacturer == Manufacturer1 && r.ModelName == ModelName1);
         content.Rockets.Should().ContainSingle(r => r.Manufacturer == Manufacturer2 && r.ModelName == ModelName2);
@@ -71,13 +71,13 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
         var content = await response.Content.ReadFromJsonAsync<RocketDto>();
 
         content.Should().NotBeNull();
-        ValidateRocket(content!);
+        ValidateRocket(content);
 
         response = await ApiClient.GetAsync("api/rockets");
         var allRocketsContent = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions);
 
         allRocketsContent.Should().NotBeNull();
-        allRocketsContent!.Rockets.Should().NotBeEmpty()
+        allRocketsContent.Rockets.Should().NotBeEmpty()
                           .And.HaveCount(1);
         ValidateRocket(allRocketsContent.Rockets.First());
 
