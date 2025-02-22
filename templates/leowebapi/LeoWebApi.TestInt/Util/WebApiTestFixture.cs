@@ -50,6 +50,7 @@ public sealed class WebApiTestFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        await Factory.DisposeAsync();
         await _postgresContainer.StopAsync();
         await _postgresContainer.DisposeAsync();
     }
