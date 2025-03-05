@@ -19,7 +19,7 @@ public sealed class RocketController(
 {
     [HttpGet]
     [Route("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<RocketDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<RocketDto>> GetRocketById([FromRoute] int id)
@@ -36,7 +36,8 @@ public sealed class RocketController(
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Route("")]
+    [ProducesResponseType<AllRocketsResponse>(StatusCodes.Status200OK)]
     public async ValueTask<ActionResult<AllRocketsResponse>> GetAllRockets()
     {
         IReadOnlyCollection<Rocket> rockets = await rocketService.GetAllRocketsAsync();
@@ -48,6 +49,7 @@ public sealed class RocketController(
     }
 
     [HttpPost]
+    [Route("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async ValueTask<IActionResult> AddRocket([FromBody] AddRocketRequest addRequest)
@@ -81,6 +83,8 @@ public sealed class RocketController(
 
     [HttpDelete]
     [Route("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<IActionResult> DeleteRocket([FromRoute] int id)
     {
         try
