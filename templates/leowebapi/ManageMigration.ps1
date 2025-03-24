@@ -5,6 +5,27 @@ param(
     [string]$StartupProject   = "./LeoWebApi/LeoWebApi.csproj"
 )
 
+function Add-Migration {
+    param ([string]$migrationName)
+
+    if ([string]::IsNullOrWhiteSpace($migrationName)) {
+        $migrationName = "Initial"
+    }
+
+    Write-Host "`nAdding migration '$migrationName'..."
+    dotnet ef migrations add $migrationName `
+        --project $MigrationProject `
+        --startup-project $StartupProject
+
+}
+
+function Update-Database {
+    Write-Host "`nUpdating the database..."
+    dotnet ef database update `
+        --project $MigrationProject `
+        --startup-project $StartupProject
+}
+
 Write-Host "=================================="
 Write-Host "   EF Core Migration Management   "
 Write-Host "=================================="
@@ -15,41 +36,24 @@ Write-Host "----------------------------------"
 
 $choice = Read-Host "Please enter 1, 2 or 3"
 
-switch ($choice) {
+switch ($choice)
+{
     1 {
         $migrationName = Read-Host "Enter the migration name (leave blank for 'Initial')"
-        if ([string]::IsNullOrWhiteSpace($migrationName)) {
-            $migrationName = "Initial"
-        }
-
-        Write-Host "`nAdding migration '$migrationName'..."
-        dotnet ef migrations add $migrationName `
-            --project $MigrationProject `
-            --startup-project $StartupProject
+        Add-Migration $migrationName
     }
 
     2 {
-        Write-Host "`nUpdating the database..."
-        dotnet ef database update `
-            --project $MigrationProject `
-            --startup-project $StartupProject
+        Update-Database
     }
+
     3 {
         $migrationName = Read-Host "Enter the migration name (leave blank for 'Initial')"
-        if ([string]::IsNullOrWhiteSpace($migrationName))
-        {
-            $migrationName = "Initial"
+        Add-Migration $migrationName
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "--------------------------------------------------------------------"
+            Update-Database
         }
-
-        Write-Host "`nAdding migration '$migrationName'..."
-        dotnet ef migrations add $migrationName `
-            --project $MigrationProject `
-            --startup-project $StartupProject
-
-        Write-Host "`nUpdating the database..."
-        dotnet ef database update `
-            --project $MigrationProject `
-            --startup-project $StartupProject
     }
 
     default {
