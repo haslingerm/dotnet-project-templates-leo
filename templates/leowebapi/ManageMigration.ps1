@@ -53,6 +53,9 @@ switch ($choice)
         if ($LASTEXITCODE -eq 0) {
             Write-Host "--------------------------------------------------------------------"
             Update-Database
+        } else {
+            Write-Host "--------------------------------------------------------------------"
+            Write-Host "Migration failed. Database update skipped."
         }
     }
 
