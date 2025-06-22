@@ -11,7 +11,7 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
     // Note: make sure you have created a migration before running the tests!
     
     [Fact]
-    public async Task GetAllRockets_ExistingRockets_Success()
+    public async ValueTask GetAllRockets_ExistingRockets_Success()
     {
         const string Manufacturer1 = "Blue Origin";
         const string ModelName1 = "New Shepard";
@@ -38,10 +38,10 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
             await ctx.SaveChangesAsync();
         });
 
-        var response = await ApiClient.GetAsync("api/rockets");
+        var response = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions);
+        var content = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions, TestCancellationToken);
 
         content.Should().NotBeNull();
         content.Rockets.Should().NotBeEmpty()
@@ -51,7 +51,7 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
     }
 
     [Fact]
-    public async Task AddRocket_Success()
+    public async ValueTask AddRocket_Success()
     {
         const string Manufacturer = "NASA";
         const string ModelName = "Saturn V";
@@ -64,17 +64,17 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
             ModelName = ModelName,
             MaxThrust = MaxThrust,
             PayloadDeltaV = PayloadDeltaV
-        }, JsonOptions);
+        }, JsonOptions, TestCancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         response.Headers.Location.Should().NotBeNull();
-        var content = await response.Content.ReadFromJsonAsync<RocketDto>();
+        var content = await response.Content.ReadFromJsonAsync<RocketDto>(TestCancellationToken);
 
         content.Should().NotBeNull();
         ValidateRocket(content);
 
-        response = await ApiClient.GetAsync("api/rockets");
-        var allRocketsContent = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions);
+        response = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
+        var allRocketsContent = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions, TestCancellationToken);
 
         allRocketsContent.Should().NotBeNull();
         allRocketsContent.Rockets.Should().NotBeEmpty()

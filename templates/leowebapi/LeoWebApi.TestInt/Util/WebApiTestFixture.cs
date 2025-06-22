@@ -37,7 +37,7 @@ public sealed class WebApiTestFixture : IAsyncLifetime
         set => _factory = value;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _postgresContainer.StartAsync();
 
@@ -48,7 +48,7 @@ public sealed class WebApiTestFixture : IAsyncLifetime
         Clock = Factory.TestClock;
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await Factory.DisposeAsync();
         await _postgresContainer.StopAsync();
