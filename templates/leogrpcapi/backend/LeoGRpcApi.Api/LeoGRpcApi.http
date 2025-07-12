@@ -1,0 +1,77 @@
+@Host = localhost:5200
+
+### Create a new ninja
+GRPC {{Host}}/ninjas.NinjaMgmt/CreateNinja
+
+{
+    "rank": "JONIN",
+    "code_name": "yami",
+    "weapon_proficiencies": [
+        "SHURIKEN",
+        "STAFF"
+    ],
+    "special_skills": [
+        "walk on water"
+    ]
+}
+
+> {%
+    client.global.set("ninjaId", response.body.id);
+%}
+
+### Get ninja by ID
+GRPC {{Host}}/ninjas.NinjaMgmt/GetNinjaById
+
+{
+    "id": {{ninjaId}}
+}
+
+### Get ninja by _invalid_ ID
+GRPC {{Host}}/ninjas.NinjaMgmt/GetNinjaById
+
+{
+    "id": -8
+}
+
+### Get all ninja IDs
+GRPC {{Host}}/ninjas.NinjaMgmt/GetAllNinjaIds
+
+### Create mission
+GRPC {{Host}}/ninjas.MissionMgmt/CreateMission
+
+{
+    "title": "壁のハエ",
+    "description": "Find out the secret behind the exam topic",
+    "dangerousness": 0.85
+}
+
+> {%
+    client.global.set("missionId", response.body.id);
+%}
+
+### Get all mission IDs
+GRPC {{Host}}/ninjas.MissionMgmt/GetAllMissions
+
+### Update mission
+GRPC {{Host}}/ninjas.MissionMgmt/UpdateMission
+
+{
+    "id": {{missionId}},
+    "description": "Top secret mission to find out the secret behind the exam topic",
+    "dangerousness": 0.8642
+}
+
+### Assign ninja to mission
+GRPC {{Host}}/ninjas.MissionMgmt/AssignMission
+
+{
+    "ninja_id": {{ninjaId}},
+    "mission_id": {{missionId}}
+}
+
+### Delete mission
+GRPC {{Host}}/ninjas.MissionMgmt/DeleteMission
+
+{
+    "id": {{missionId}}
+}
