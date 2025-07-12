@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:LeoGRpcApi.Client.ViewModels"
+        xmlns:views1="clr-namespace:LeoGRpcApi.Client.Views"
+        mc:Ignorable="d" d:DesignWidth="1600" d:DesignHeight="600"
+        Width="1600" Height="600"
+        x:Class="LeoGRpcApi.Client.Views.MainWindow"
+        x:DataType="viewModels:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Ninjas">
+    <Design.DataContext>
+        <viewModels:DesignMainWindowViewModel />
+    </Design.DataContext>
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Loaded">
+            <InvokeCommandAction Command="{Binding InitializeCommand}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
+    <Grid ColumnDefinitions="4*,5*" RowDefinitions="10*,*" ColumnSpacing="10" RowSpacing="5" Margin="5">
+        <ProgressBar Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" IsIndeterminate="True" VerticalAlignment="Center"
+                     IsVisible="{Binding Loading}" Margin="40" />
+        <ScrollViewer Grid.Column="0" Grid.Row="0" HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto" IsVisible="{Binding !Loading}">
+            <views1:MissionList DataContext="{Binding MissionListViewModel}" />
+        </ScrollViewer>
+        <ScrollViewer Grid.Column="1" Grid.Row="0" HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto" IsVisible="{Binding !Loading}">
+            <views1:NinjaList DataContext="{Binding NinjaListViewModel}" />
+        </ScrollViewer>
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Text="{Binding InfoText}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Grid>
+</Window>

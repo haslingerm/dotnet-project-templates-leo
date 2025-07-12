@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+option csharp_namespace = "LeoGRpcApi.Shared.ApiContract";
+package contract;
+
+service NinjaMgmt {
+    // Creates a new ninja and returns its ID
+    rpc CreateNinja (CreateNinjaRequest) returns (CreateNinjaResponse);
+    
+    // Gets the IDs of all ninjas - mind how proto3 requires a request in all cases, even if empty
+    rpc GetAllNinjaIds (GetAllRequest) returns (GetAllNinjaIdsResponse);
+    
+    // If the ninja is not found, the server will throw a RpcException with a status code
+    rpc GetNinjaById (GetNinjaByIdRequest) returns (NinjaDto);
+}
+
+service MissionMgmt {
+    // Creates a new mission and returns its ID
+    rpc CreateMission (CreateMissionRequest) returns (MissionDto);
+    
+    // Gets all missions - we are reusing the same GetAllRequest message (it is empty anyway).
+    // It might not be wise to load the full entities for all missions, but there is no rule to only return IDs
+    // like there is with REST, so it is up to us.
+    rpc GetAllMissions (GetAllRequest) returns (GetAllMissionsResponse);
+    
+    // Updates an existing mission
+    rpc UpdateMission (UpdateMissionRequest) returns (UpdateMissionResponse);
+    
+    // Assigns a mission to a ninja
+    rpc AssignMission (AssignMissionRequest) returns (AssignMissionResponse);
+    
+    // Deletes a mission
+    rpc DeleteMission (DeleteMissionRequest) returns (DeleteMissionResponse);
+}
+
+message CreateNinjaRequest {
+    NinjaRank rank = 1;
+    string code_name = 2;
+    repeated NinjaWeapon weapon_proficiencies = 3;
+    repeated string special_skills = 4;
+}
+message CreateNinjaResponse {
+    int32 id = 1;
+}
+
+message GetAllRequest {}
+message GetAllNinjaIdsResponse {
+    // Generated collection can take zero, one, or many items - but does not yet support collection expressions
+    repeated int32 ninja_ids = 1;
+}
+
+message GetNinjaByIdRequest {
+    int32 id = 1;
+}
+message NinjaDto {
+    int32 id = 1;
+    NinjaRank rank = 2;
+    string code_name = 3;
+    repeated NinjaWeapon weapon_proficiencies = 4;
+    repeated string special_skills = 5;
+    // Sadly, due to compatibility with incompetent languages like Java, we will get a long instead of a long? here
+    optional int64 current_mission = 6;
+}
+
+message CreateMissionRequest {
+    string title = 1;
+    // The generated request class will have a 'HasDescription' property to check if the description is set or not
+    optional string description = 2;
+    double dangerousness = 3;
+}
+message MissionDto {
+    int64 id = 1;
+    string title = 2;
+    optional string description = 3;
+    double dangerousness = 4;
+}
+
+message GetAllMissionsResponse {
+    repeated MissionDto missions = 1;
+}
+
+message UpdateMissionRequest {
+    int64 id = 1;
+    optional string description = 2;
+    double dangerousness = 3;
+}
+// Problems would be communicated via exceptions
+message UpdateMissionResponse {}
+
+message AssignMissionRequest {
+    int32 ninja_id = 1;
+    int64 mission_id = 2;
+}
+message AssignMissionResponse {
+    // Instead of success or exception, it is also possible to return a varied and detailed result 
+    // without exceptions and their status codes
+    MissionAssignmentResult result = 1;
+}
+
+message DeleteMissionRequest {
+    int64 id = 1;
+}
+message DeleteMissionResponse {
+    // Instead of a NotFound exception, we could also return a boolean flag
+    bool success = 1;
+}
+
+enum NinjaRank {
+    UNKNOWN_RANK = 0;
+    GENIN = 10;
+    CHUNIN = 20;
+    JONIN = 30;
+    KAGE = 40;
+}
+
+enum NinjaWeapon {
+    UNKNOWN_WEAPON = 0;
+    SWORD = 10;
+    SHURIKEN = 20;
+    STAFF = 30;
+    BOW = 40;
+    NUNCHAKU = 50;
+}
+
+enum MissionAssignmentResult {
+    UNKNOWN_ASSIGNMENT_RESULT = 0;
+    SUCCESS = 10;
+    NINJA_NOT_FOUND = 20;
+    MISSION_NOT_FOUND = 30;
+    NINJA_ALREADY_ON_MISSION = 40;
+}

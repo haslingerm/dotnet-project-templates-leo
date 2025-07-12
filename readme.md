@@ -57,6 +57,23 @@ WebAPI (REST) Application
 
 > Example: `dotnet new leowebapi -n Rockets -o .`
 
+### `leogrpcapi`
+
+Full stack application:
+
+- gRPC API backend
+  - Including persistence
+  - Including integration tests
+  - Sample gRPC calls from `.http` file
+  - By default binds to port 5200
+- Avalonia UI frontend as gRPC client
+- Shared `.proto` contract
+- Communication happens via HTTP/2, but without SSL
+  - In production, SSL termination should be provided by reverse proxy in front of the API
+- Migrations can be managed via provided script
+- Includes .gitignore & .editorconfig files
+- Does not contain Auth
+
 ### `leominiapi`
 
 Minimal WebAPI (REST) Application

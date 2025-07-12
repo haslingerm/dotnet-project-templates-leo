@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "M. Haslinger",
+  "classifications": [ "Common", "WebApi", "gRPC" ],
+  "identity": "HTLLeonding.GRpcApiTemplate.CSharp",
+  "name": "HTL Leonding gRPC API Application",
+  "shortName": "leogrpcapi",
+  "tags": {
+    "type": "solution",
+	  "language": "C#"
+  },
+  "sourceName": "LeoGRpcApi"
+}

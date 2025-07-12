@@ -18,17 +18,18 @@ public abstract class WebApiTestBase(WebApiTestFixture webApiFixture) : IClassFi
 
     protected HttpClient ApiClient => webApiFixture.Client;
     protected IClock TestClock => webApiFixture.Clock;
-
-    public async Task InitializeAsync()
+    protected CancellationToken TestCancellationToken => TestContext.Current.CancellationToken;
+    
+    public async ValueTask InitializeAsync()
     {
         await webApiFixture.RestoreDatabaseAsync(ImportSeedDataAsync);
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         // nothing to dispose
         // database is reset during init to ensure a clean slate even if a test run is interrupted
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     protected virtual ValueTask ImportSeedDataAsync(DatabaseContext context)

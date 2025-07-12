@@ -1,0 +1,28 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels1="clr-namespace:LeoGRpcApi.Client.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels1:NinjaListViewModel"
+             x:Class="LeoGRpcApi.Client.Views.NinjaList">
+    <Design.DataContext>
+        <viewModels1:DesignNinjaListViewModel />
+    </Design.DataContext>
+    <DockPanel>
+        <DataGrid ItemsSource="{Binding Ninjas}" DockPanel.Dock="Top"
+                  AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="All"
+                  BorderThickness="1" Margin="5" SelectionMode="Single" SelectedItem="{Binding SelectedNinja}"
+                  SelectionChanged="HandleSelectionChanged" CanUserReorderColumns="True" CanUserResizeColumns="True"
+                  CanUserSortColumns="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" />
+                <DataGridTextColumn Header="CodeName" Binding="{Binding CodeName}" Width="Auto" />
+                <DataGridTextColumn Header="Rank" Binding="{Binding Rank}" Width="Auto" />
+                <DataGridCheckBoxColumn Header="Deployed" Binding="{Binding IsDeployed}" Width="Auto" />
+                <DataGridTextColumn Header="Skills" Binding="{Binding SpecialSkills}" Width="Auto" />
+                <DataGridTextColumn Header="Weapons" Binding="{Binding WeaponProficiencies}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

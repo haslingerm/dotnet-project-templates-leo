@@ -1,0 +1,58 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels1="clr-namespace:LeoGRpcApi.Client.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels1:MissionListViewModel"
+             x:Class="LeoGRpcApi.Client.Views.MissionList">
+    <Design.DataContext>
+        <viewModels1:DesignMissionListViewModel />
+    </Design.DataContext>
+    <DockPanel>
+        <DataGrid ItemsSource="{Binding Missions}" DockPanel.Dock="Top"
+                  AutoGenerateColumns="False" IsReadOnly="{Binding Processing}" GridLinesVisibility="All"
+                  BorderThickness="1" Margin="5" CellEditEnded="HandleCellEditEnded" CanUserSortColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" IsReadOnly="True" />
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto" IsReadOnly="True" />
+                <DataGridTemplateColumn Header="Danger" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Dangerousness, StringFormat='{}{0:P0}'}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="5,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Spacing="5">
+                                <TextBlock Text="{Binding Dangerousness, StringFormat='{}{0:P0}'}"
+                                           HorizontalAlignment="Center"
+                                           MinWidth="40" />
+                                <Slider Minimum="0"
+                                        Maximum="1"
+                                        Value="{Binding Dangerousness}"
+                                        Width="60"
+                                        Margin="5,0"
+                                        IsSnapToTickEnabled="False" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
+            </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Assign Ninja"
+                              Command="{Binding AssignNinjaCommand}"
+                              CommandParameter="{Binding $parent[DataGrid].SelectedItem}" />
+                    <MenuItem Header="Delete Mission" 
+                              Command="{Binding DeleteMissionCommand}" 
+                              CommandParameter="{Binding $parent[DataGrid].SelectedItem}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

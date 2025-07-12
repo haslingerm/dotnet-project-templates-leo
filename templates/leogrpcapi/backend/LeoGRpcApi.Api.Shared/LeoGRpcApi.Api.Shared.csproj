@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\shared\LeoGRpcApi.Shared.ApiContract\LeoGRpcApi.Shared.ApiContract.csproj" />
+    </ItemGroup>
+
+</Project>
