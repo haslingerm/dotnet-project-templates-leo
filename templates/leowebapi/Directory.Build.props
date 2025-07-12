@@ -10,7 +10,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="NodaTime" Version="3.2.2"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7"/>
         <PackageReference Include="HTLLeonding.Utility.LeoAnalyzers" Version="1.0.2"/>
     </ItemGroup>
     <ItemGroup>
