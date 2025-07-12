@@ -7,7 +7,7 @@ namespace LeoGRpcApi.Api.Persistence.Util;
 
 public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
 {
-    public const string SchemaName = "ninjas";
+    public const string SchemaName = "LeoGRpcApi";
     
     public DbSet<Ninja> Ninjas { get; set; }
     public DbSet<Mission> Missions { get; set; }
