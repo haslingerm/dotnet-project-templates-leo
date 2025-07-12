@@ -1,8 +1,8 @@
 #!/usr/bin/env pwsh
 
 param(
-    [string]$MigrationProject = "./CollectionApi.Persistence/CollectionApi.Persistence.csproj",
-    [string]$StartupProject   = "./CollectionApi/CollectionApi.csproj"
+    [string]$MigrationProject = "./LeoWebApi.Persistence/LeoWebApi.Persistence.csproj",
+    [string]$StartupProject   = "./LeoWebApi/LeoWebApi.csproj"
 )
 
 function Add-Migration {
