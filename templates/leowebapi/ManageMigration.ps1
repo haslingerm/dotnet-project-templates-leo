@@ -5,6 +5,9 @@ param(
     [string]$StartupProject   = "./LeoWebApi/LeoWebApi.csproj"
 )
 
+# Define regex for migration names to skip the [dbg] logs and select the migratation by checking the  date at the beginning
+$MigrationNameRegex = '^\d{14}_.+'
+
 function Add-Migration {
     param ([string]$migrationName)
 
@@ -34,7 +37,12 @@ function Script-Migration {
     )
 
     if ([string]::IsNullOrWhiteSpace($toMigration)) {
-        $toMigration = (dotnet ef migrations list --project $MigrationProject --startup-project $StartupProject | Select-Object -Last 1)
+        # Use List-Migrations logic to ensure consistent filtering
+        $toMigration = (dotnet ef migrations list `
+            --project $MigrationProject `
+            --startup-project $StartupProject |
+            Where-Object { $_ -match $MigrationNameRegex } |
+            Select-Object -Last 1)
     }
 
     if ([string]::IsNullOrWhiteSpace($outputPath)) {
@@ -56,16 +64,17 @@ function List-Migrations {
     $migrations = dotnet ef migrations list `
         --project $MigrationProject `
         --startup-project $StartupProject |
-        Where-Object { $_ -match '^\d{14}_.+' }
+        Where-Object { $_ -match $MigrationNameRegex }
     $i = 0
     foreach ($migration in $migrations) {
-        Write-Host "[$i] $migration"
+        Write-Host "$i. $migration"
         $i++
     }
-    if ($i -eq 1) {
+    if ($i -eq 0) {
         Write-Host "No migrations found."
     }
     Write-Host "----------------------------------"
+    return $migrations
 }
 
 Write-Host "=================================="
@@ -106,8 +115,8 @@ switch ($choice)
     4 {
         Write-Host "`nGenerating SQL Migration Script..."
         List-Migrations
-        $fromMigration = Read-Host "Enter the start migration (leave blank for '0')"
-        $toMigration = Read-Host "Enter the target migration (leave blank for latest)"
+        $fromMigration = Read-Host "Enter the start migration name (leave blank for '0' )"
+        $toMigration = Read-Host "Enter the target migration name (leave blank for latest)"
         $outputPath = Read-Host "Enter output SQL file path (leave blank for './migration.sql')"
         Script-Migration $fromMigration $toMigration $outputPath
     }
