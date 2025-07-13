@@ -9,7 +9,7 @@
         x:Class="LeoGRpcApi.Client.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Ninjas">
+        Title="LeoGRpcApi">
     <Design.DataContext>
         <viewModels:DesignMainWindowViewModel />
     </Design.DataContext>
