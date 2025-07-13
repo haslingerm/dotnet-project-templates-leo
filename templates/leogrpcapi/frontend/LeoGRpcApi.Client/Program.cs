@@ -11,12 +11,13 @@ namespace LeoGRpcApi.Client;
 internal sealed class Program
 {
     private static IServiceProvider _serviceProvider = null!;
+//-:cnd:noEmit 
 #if DEBUG
     private const string EnvironmentName = "Development";
 #else
     private const string EnvironmentName = "Production";
 #endif
-
+//+:cnd:noEmit 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
