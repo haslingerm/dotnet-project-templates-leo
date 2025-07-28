@@ -115,7 +115,7 @@ switch ($choice)
     4 {
         Write-Host "`nGenerating SQL Migration Script..."
         List-Migrations
-        $fromMigration = Read-Host "Enter the start migration name (leave blank for '0' )"
+        $fromMigration = Read-Host "Enter the start migration name (leave blank for '0')"
         $toMigration = Read-Host "Enter the target migration name (leave blank for latest)"
         $outputPath = Read-Host "Enter output SQL file path (leave blank for './migration.sql')"
         Script-Migration $fromMigration $toMigration $outputPath
