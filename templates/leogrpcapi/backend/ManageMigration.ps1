@@ -5,7 +5,7 @@ param(
     [string]$StartupProject   = "./LeoGRpcApi.Api/LeoGRpcApi.Api.csproj"
 )
 
-# Define regex for migration names to skip the [dbg] logs and select the migratation by checking the  date at the beginning
+# Define regex for migration names to skip the [dbg] logs and select the migration by checking the date at the beginning
 $MigrationNameRegex = '^\d{14}_.+'
 
 function Add-Migration {
