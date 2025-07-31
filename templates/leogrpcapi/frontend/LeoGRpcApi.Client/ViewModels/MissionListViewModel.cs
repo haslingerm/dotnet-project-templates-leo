@@ -42,7 +42,7 @@ public partial class MissionListViewModel(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to load missions");
-            toast.ShowMessage("Failed to load missions", "Error", NotificationType.Error);
+            toast.ShowError("Failed to load missions");
         }
         finally
         {
@@ -75,7 +75,7 @@ public partial class MissionListViewModel(
             bool result = await missionService.DeleteMissionAsync(mission.Id);
             if (!result)
             {
-                toast.ShowMessage(ErrorMessage, "Warning", NotificationType.Warning);
+                toast.ShowWarning(ErrorMessage);
 
                 return;
             }
@@ -86,7 +86,7 @@ public partial class MissionListViewModel(
         catch (Exception ex)
         {
             logger.LogError(ex, ErrorMessage);
-            toast.ShowMessage(ErrorMessage, "Error", NotificationType.Error);
+            toast.ShowError(ErrorMessage);
         }
         finally
         {
@@ -106,7 +106,7 @@ public partial class MissionListViewModel(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to edit mission");
-            toast.ShowMessage("Failed to edit mission", "Error", NotificationType.Error);
+            toast.ShowError("Failed to edit mission");
 
             var original = _originalValues[mission.Id];
             mission.Dangerousness = original.Dangerousness;

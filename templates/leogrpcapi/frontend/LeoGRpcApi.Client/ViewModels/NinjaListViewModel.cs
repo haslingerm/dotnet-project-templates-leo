@@ -55,7 +55,7 @@ public partial class NinjaListViewModel(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to load ninjas");
-            toast.ShowMessage("Failed to load ninjas", "Error", NotificationType.Error);
+            toast.ShowError("Failed to load ninjas");
         }
         finally
         {
@@ -74,7 +74,7 @@ public partial class NinjaListViewModel(
             // reacting only to an expected NotFound, other RPC exception will bubble up
             catch (RpcException ex) when (ex.Status.StatusCode == StatusCode.NotFound)
             {
-                toast.ShowMessage($"Ninja #{id} not found", "Warning", NotificationType.Warning);
+                toast.ShowWarning($"Ninja #{id} not found");
             }
         }
     }
@@ -100,8 +100,7 @@ public partial class NinjaListViewModel(
 
         if (ninja.IsDeployed)
         {
-            toast.ShowMessage("Selected ninja is already deployed on a mission",
-                              "Warning", NotificationType.Warning);
+            toast.ShowWarning("Selected ninja is already deployed on a mission");
 
             return;
         }
@@ -120,36 +119,32 @@ public partial class NinjaListViewModel(
                     PickForMissionId = null;
 
                     UpdateDisplay();
-                    toast.ShowMessage("Ninja assigned to mission", "Success", NotificationType.Success);
+                    toast.ShowSuccess("Ninja assigned to mission");
 
                     break;
                 }
                 case MissionAssignmentResult.NinjaNotFound:
                 {
-                    toast.ShowMessage("Selected ninja was not found at the backend",
-                                      "Warning", NotificationType.Warning);
+                    toast.ShowWarning("Selected ninja was not found at the backend");
 
                     break;
                 }
                 case MissionAssignmentResult.MissionNotFound:
                 {
-                    toast.ShowMessage("Selected mission was not found at the backend",
-                                      "Warning", NotificationType.Warning);
+                    toast.ShowWarning("Selected mission was not found at the backend");
 
                     break;
                 }
                 case MissionAssignmentResult.NinjaAlreadyOnMission:
                 {
-                    toast.ShowMessage("Selected ninja is already on a mission",
-                                      "Warning", NotificationType.Warning);
+                    toast.ShowWarning("Selected ninja is already on a mission");
 
                     break;
                 }
                 case MissionAssignmentResult.UnknownAssignmentResult:
                 default:
                 {
-                    toast.ShowMessage("Failed to assign ninja to mission",
-                                      "Error", NotificationType.Error);
+                    toast.ShowError("Failed to assign ninja to mission");
 
                     break;
                 }
@@ -158,7 +153,7 @@ public partial class NinjaListViewModel(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to assign ninja to mission");
-            toast.ShowMessage("Failed to assign ninja to mission", "Error", NotificationType.Error);
+            toast.ShowError("Failed to assign ninja to mission");
         }
         finally
         {

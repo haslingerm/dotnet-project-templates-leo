@@ -72,6 +72,10 @@ public static class DesignFacades
         {
             Console.WriteLine($"Toast: [{title}] {message}");
         }
+        
+        public void ShowError(string message) => ShowMessage(message, "Error", NotificationType.Error);
+        public void ShowWarning(string message) => ShowMessage(message, "Warning", NotificationType.Warning);
+        public void ShowSuccess(string message) => ShowMessage(message, "Success", NotificationType.Success);
 
         public void SetWindow(Window window) { }
     }
