@@ -1,5 +1,6 @@
 ﻿using LeoGRpcApi.Client.Core.Util;
 using LeoGRpcApi.Shared.ApiContract;
+using LeoGRpcApi.Shared.ApiContract.Validation;
 
 namespace LeoGRpcApi.Client.Core.Services;
 
@@ -59,6 +60,7 @@ internal sealed class MissionService(GrpcClientFactory clientFactory)
             Dangerousness = dangerousness,
             Description = description
         };
+        ThrowIfInvalid<UpdateMissionRequest, UpdateMissionRequestValidator>(request);
 
         await ApiClient.UpdateMissionAsync(request);
     }
@@ -66,6 +68,8 @@ internal sealed class MissionService(GrpcClientFactory clientFactory)
     public async ValueTask<bool> DeleteMissionAsync(long missionId)
     {
         var request = new DeleteMissionRequest { Id = missionId };
+        ThrowIfInvalid<DeleteMissionRequest, DeleteMissionRequestValidator>(request);
+        
         var result = await ApiClient.DeleteMissionAsync(request);
 
         return result.Success;
@@ -78,6 +82,8 @@ internal sealed class MissionService(GrpcClientFactory clientFactory)
             MissionId = missionId,
             NinjaId = ninjaId
         };
+        ThrowIfInvalid<AssignMissionRequest, AssignMissionRequestValidator>(request);
+        
         var response = await ApiClient.AssignMissionAsync(request);
 
         return response.Result;

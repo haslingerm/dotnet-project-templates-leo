@@ -1,10 +1,10 @@
-﻿using FluentValidation;
-using Grpc.Core;
+﻿using Grpc.Core;
 using LeoGRpcApi.Api.Core.Services;
 using LeoGRpcApi.Api.Persistence.Model;
 using LeoGRpcApi.Api.Persistence.Util;
 using LeoGRpcApi.Api.Util;
 using LeoGRpcApi.Shared.ApiContract;
+using LeoGRpcApi.Shared.ApiContract.Validation;
 using OneOf;
 using OneOf.Types;
 
@@ -17,7 +17,7 @@ public sealed class MissionMgmtEndpoint(
     : MissionMgmt.MissionMgmtBase
 {
     public override async Task<MissionDto> CreateMission(CreateMissionRequest request,
-                                                                    ServerCallContext context)
+                                                         ServerCallContext context)
     {
         RpcHelper.ThrowIfInvalid<CreateMissionRequest, CreateMissionRequestValidator>(request);
 
@@ -50,7 +50,7 @@ public sealed class MissionMgmtEndpoint(
     }
 
     public override async Task<UpdateMissionResponse> UpdateMission(UpdateMissionRequest request,
-                                                                      ServerCallContext context)
+                                                                    ServerCallContext context)
     {
         RpcHelper.ThrowIfInvalid<UpdateMissionRequest, UpdateMissionRequestValidator>(request);
 
@@ -90,14 +90,14 @@ public sealed class MissionMgmtEndpoint(
             OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
                 assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
             var result = await assignMissionResult.Match<ValueTask<MissionAssignmentResult>>(async success =>
-             {
-                 await transaction.CommitAsync();
+                 {
+                     await transaction.CommitAsync();
 
-                 return MissionAssignmentResult.Success;
-             },
-             missionNotFound => ValueTask.FromResult(MissionAssignmentResult.MissionNotFound),
-             ninjaNotFound => ValueTask.FromResult(MissionAssignmentResult.NinjaNotFound),
-             ninjaBusy => ValueTask.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
+                     return MissionAssignmentResult.Success;
+                 },
+                 missionNotFound => ValueTask.FromResult(MissionAssignmentResult.MissionNotFound),
+                 ninjaNotFound => ValueTask.FromResult(MissionAssignmentResult.NinjaNotFound),
+                 ninjaBusy => ValueTask.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
 
             return new AssignMissionResponse
             {
@@ -113,7 +113,7 @@ public sealed class MissionMgmtEndpoint(
     }
 
     public override async Task<DeleteMissionResponse> DeleteMission(DeleteMissionRequest request,
-                                                                      ServerCallContext context)
+                                                                    ServerCallContext context)
     {
         RpcHelper.ThrowIfInvalid<DeleteMissionRequest, DeleteMissionRequestValidator>(request);
 
@@ -140,45 +140,6 @@ public sealed class MissionMgmtEndpoint(
             logger.LogError(ex, "Failed to delete mission");
 
             throw RpcHelper.InternalError();
-        }
-    }
-
-    private sealed class CreateMissionRequestValidator : AbstractValidator<CreateMissionRequest>
-    {
-        public const double MinDangerousness = 0D;
-        public const double MaxDangerousness = 1D;
-
-        public CreateMissionRequestValidator()
-        {
-            RuleFor(r => r.Title).NotEmpty();
-            RuleFor(r => r.Dangerousness).InclusiveBetween(MinDangerousness, MaxDangerousness);
-        }
-    }
-
-    private sealed class UpdateMissionRequestValidator : AbstractValidator<UpdateMissionRequest>
-    {
-        public UpdateMissionRequestValidator()
-        {
-            RuleFor(r => r.Id).GreaterThan(0L);
-            RuleFor(r => r.Dangerousness).InclusiveBetween(CreateMissionRequestValidator.MinDangerousness,
-                                                           CreateMissionRequestValidator.MaxDangerousness);
-        }
-    }
-
-    private sealed class AssignMissionRequestValidator : AbstractValidator<AssignMissionRequest>
-    {
-        public AssignMissionRequestValidator()
-        {
-            RuleFor(r => r.MissionId).GreaterThan(0L);
-            RuleFor(r => r.NinjaId).GreaterThan(0);
-        }
-    }
-
-    private sealed class DeleteMissionRequestValidator : AbstractValidator<DeleteMissionRequest>
-    {
-        public DeleteMissionRequestValidator()
-        {
-            RuleFor(r => r.Id).GreaterThan(0L);
         }
     }
 }

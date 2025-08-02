@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <PackageVersion>1.9.1</PackageVersion>
+    <PackageVersion>1.9.2</PackageVersion>
     <PackageId>HTLLeonding.Utility.Templates</PackageId>
 	  <PackageReadmeFile>readme.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>

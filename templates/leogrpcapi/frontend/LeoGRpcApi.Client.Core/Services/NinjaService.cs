@@ -1,5 +1,6 @@
 ﻿using LeoGRpcApi.Client.Core.Util;
 using LeoGRpcApi.Shared.ApiContract;
+using LeoGRpcApi.Shared.ApiContract.Validation;
 
 namespace LeoGRpcApi.Client.Core.Services;
 
@@ -37,6 +38,8 @@ internal sealed class NinjaService(GrpcClientFactory clientFactory)
     public async ValueTask<NinjaDto> GetNinjaByIdAsync(int id)
     {
         var request = new GetNinjaByIdRequest { Id = id };
+        ThrowIfInvalid<GetNinjaByIdRequest, GetNinjaByIdRequestValidator>(request);
+        
         // no need to construct a route, we simply call a method remotely
         var response = await ApiClient.GetNinjaByIdAsync(request);
 
