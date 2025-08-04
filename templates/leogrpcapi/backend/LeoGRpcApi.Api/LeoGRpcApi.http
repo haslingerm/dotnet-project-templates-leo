@@ -1,7 +1,7 @@
 @Host = localhost:5200
 
 ### Create a new ninja
-GRPC {{Host}}/ninjas.NinjaMgmt/CreateNinja
+GRPC {{Host}}/contract.NinjaMgmt/CreateNinja
 
 {
     "rank": "JONIN",
@@ -20,24 +20,24 @@ GRPC {{Host}}/ninjas.NinjaMgmt/CreateNinja
 %}
 
 ### Get ninja by ID
-GRPC {{Host}}/ninjas.NinjaMgmt/GetNinjaById
+GRPC {{Host}}/contract.NinjaMgmt/GetNinjaById
 
 {
     "id": {{ninjaId}}
 }
 
 ### Get ninja by _invalid_ ID
-GRPC {{Host}}/ninjas.NinjaMgmt/GetNinjaById
+GRPC {{Host}}/contract.NinjaMgmt/GetNinjaById
 
 {
     "id": -8
 }
 
 ### Get all ninja IDs
-GRPC {{Host}}/ninjas.NinjaMgmt/GetAllNinjaIds
+GRPC {{Host}}/contract.NinjaMgmt/GetAllNinjaIds
 
 ### Create mission
-GRPC {{Host}}/ninjas.MissionMgmt/CreateMission
+GRPC {{Host}}/contract.MissionMgmt/CreateMission
 
 {
     "title": "壁のハエ",
@@ -50,10 +50,10 @@ GRPC {{Host}}/ninjas.MissionMgmt/CreateMission
 %}
 
 ### Get all mission IDs
-GRPC {{Host}}/ninjas.MissionMgmt/GetAllMissions
+GRPC {{Host}}/contract.MissionMgmt/GetAllMissions
 
 ### Update mission
-GRPC {{Host}}/ninjas.MissionMgmt/UpdateMission
+GRPC {{Host}}/contract.MissionMgmt/UpdateMission
 
 {
     "id": {{missionId}},
@@ -62,7 +62,7 @@ GRPC {{Host}}/ninjas.MissionMgmt/UpdateMission
 }
 
 ### Assign ninja to mission
-GRPC {{Host}}/ninjas.MissionMgmt/AssignMission
+GRPC {{Host}}/contract.MissionMgmt/AssignMission
 
 {
     "ninja_id": {{ninjaId}},
@@ -70,7 +70,7 @@ GRPC {{Host}}/ninjas.MissionMgmt/AssignMission
 }
 
 ### Delete mission
-GRPC {{Host}}/ninjas.MissionMgmt/DeleteMission
+GRPC {{Host}}/contract.MissionMgmt/DeleteMission
 
 {
     "id": {{missionId}}

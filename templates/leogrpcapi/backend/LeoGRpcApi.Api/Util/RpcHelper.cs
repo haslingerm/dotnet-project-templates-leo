@@ -56,4 +56,10 @@ internal static class RpcHelper
     /// <returns>A not found exception</returns>
     public static RpcException NotFound() =>
         new(new Status(StatusCode.NotFound, "The requested resource was not found"));
+        
+    /// <summary>
+    ///     Creates a <see cref="RpcException" /> with <see cref="StatusCode.InvalidArgument" />
+    /// </summary>
+    /// <returns>An invalid data exception</returns>
+    public static RpcException Invalid() => new(new Status(StatusCode.InvalidArgument, "The request is invalid"));
 }
