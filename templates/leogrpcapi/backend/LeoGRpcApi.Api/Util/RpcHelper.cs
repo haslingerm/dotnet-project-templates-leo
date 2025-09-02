@@ -62,4 +62,11 @@ internal static class RpcHelper
     /// </summary>
     /// <returns>An invalid data exception</returns>
     public static RpcException Invalid() => new(new Status(StatusCode.InvalidArgument, "The request is invalid"));
+    
+    /// <summary>
+    ///     Creates a <see cref="RpcException" /> with <see cref="StatusCode.Aborted" />
+    /// </summary>
+    /// <returns>A conflicting operation exception</returns>
+    public static RpcException Conflict() =>
+        new(new Status(StatusCode.Aborted, "The request conflicts with the current state of the resource"));
 }

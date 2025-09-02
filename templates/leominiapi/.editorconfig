@@ -394,7 +394,7 @@ dotnet_style_qualification_for_event = false:suggestion
 dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
-dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+dotnet_style_require_accessibility_modifiers = always:suggestion
 file_header_template = 
 
 # ReSharper properties
