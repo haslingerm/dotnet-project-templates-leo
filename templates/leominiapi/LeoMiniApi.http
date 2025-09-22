@@ -4,4 +4,4 @@
 GET {{BaseUrl}}/hello/Schwammal
 
 ### OpenAPI
-GET {{BaseUrl}}/swagger/v1/swagger.json
+GET {{BaseUrl}}/openapi/v1.json

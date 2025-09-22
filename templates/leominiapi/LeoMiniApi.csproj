@@ -9,9 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="HTLLeonding.Utility.LeoAnalyzers" Version="1.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
   </ItemGroup>
 
 </Project>

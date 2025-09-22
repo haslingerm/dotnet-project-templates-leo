@@ -3,7 +3,7 @@ using LeoMiniApi.Core;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 builder.Services.RegisterServices();
 builder.Services.AddCors();
 builder.Services.ConfigureCors();
@@ -13,7 +13,7 @@ var app = builder.Build();
 
 if(builder.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.MapOpenApi();
 }
 
 app.UseCors(Setup.CorsPolicyName);
