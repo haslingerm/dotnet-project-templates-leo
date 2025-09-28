@@ -8,7 +8,9 @@
 
     <ItemGroup>
         <PackageReference Include="Grpc.Net.Client" Version="2.71.0"/>
-        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
+        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
+        <PackageReference Update="HTLLeonding.Utility.LeoAnalyzers" Version="1.1.2" />
     </ItemGroup>
 
     <ItemGroup>
