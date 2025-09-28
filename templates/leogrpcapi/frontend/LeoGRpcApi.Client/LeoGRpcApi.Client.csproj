@@ -34,8 +34,6 @@
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="System.Text.Json" Version="9.0.9" />
         <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.6.2" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
-        <PackageReference Update="HTLLeonding.Utility.LeoAnalyzers" Version="1.1.2" />
     </ItemGroup>
 
     <ItemGroup>

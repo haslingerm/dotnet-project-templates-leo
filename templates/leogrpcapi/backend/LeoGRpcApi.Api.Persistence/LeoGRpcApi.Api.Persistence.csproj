@@ -9,8 +9,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.9" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="9.0.4"/>
-        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
-        <PackageReference Update="HTLLeonding.Utility.LeoAnalyzers" Version="1.1.2" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\LeoGRpcApi.Api.Shared\LeoGRpcApi.Api.Shared.csproj"/>
