@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/SolutionItems/">
+    <File Path=".github/workflows/build_on_push.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="ManageMigration.ps1" />
+  </Folder>
+  <Project Path="LeoWebApi.Core/LeoWebApi.Core.csproj" />
+  <Project Path="LeoWebApi.Persistence/LeoWebApi.Persistence.csproj" />
+  <Project Path="LeoWebApi.Shared/LeoWebApi.Shared.csproj" />
+  <Project Path="LeoWebApi.Test/LeoWebApi.Test.csproj" />
+  <Project Path="LeoWebApi.TestInt/LeoWebApi.TestInt.csproj" />
+  <Project Path="LeoWebApi/LeoWebApi.csproj" />
+</Solution>
