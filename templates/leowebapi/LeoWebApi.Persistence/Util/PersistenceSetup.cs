@@ -10,16 +10,6 @@ public static class PersistenceSetup
     private const string ConnectionStringName = "Postgres";
     private const string MigrationHistoryTable = "__EFMigrationsHistory";
 
-    public static void ConfigurePersistence(this IServiceCollection services,
-                                            IConfigurationManager configurationManager,
-                                            bool isDev)
-    {
-        ConfigureDatabase(services, configurationManager, isDev);
-
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ITransactionProvider, UnitOfWork>();
-    }
-
     private static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration,
                                           bool isDev)
     {
@@ -27,7 +17,8 @@ public static class PersistenceSetup
                                   ?? throw new InvalidOperationException("Connection string not found");
         services.AddDbContext<DatabaseContext>(optionsBuilder =>
         {
-            ConfigureDatabaseContextOptions(optionsBuilder, connectionString, isDev);
+            ConfigureDatabaseContextOptions(optionsBuilder, connectionString,
+                                            isDev);
         });
     }
 
@@ -47,6 +38,18 @@ public static class PersistenceSetup
         {
             optionsBuilder.EnableSensitiveDataLogging()
                           .EnableDetailedErrors();
+        }
+    }
+
+    extension(IServiceCollection services)
+    {
+        public void ConfigurePersistence(IConfigurationManager configurationManager,
+                                         bool isDev)
+        {
+            ConfigureDatabase(services, configurationManager, isDev);
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ITransactionProvider, UnitOfWork>();
         }
     }
 }
