@@ -31,8 +31,7 @@ app.MapGet("/hello/{name}", (string? name, IClock clock) =>
    })
    .Produces<Greeting>(StatusCodes.Status200OK)
    .Produces(StatusCodes.Status400BadRequest)
-   .WithName("Greetings")
-   .WithOpenApi();
+   .WithName("Greetings");
 
 await app.RunAsync();
 

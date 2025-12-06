@@ -2,6 +2,7 @@ using System.Data;
 using LeoGRpcApi.Api.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 
 namespace LeoGRpcApi.Api.Persistence.Util;
 
