@@ -9,7 +9,7 @@ namespace LeoGRpcApi.Api.TestInt.Util;
 public sealed class ApiTestFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
-                                                              .WithImage("postgres:17")
+                                                              .WithImage("postgres:18")
                                                               .WithDatabase("public")
                                                               .WithUsername("postgres")
                                                               .WithPassword("postgres")
