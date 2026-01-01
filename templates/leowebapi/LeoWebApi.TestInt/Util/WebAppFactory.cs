@@ -10,11 +10,10 @@ namespace LeoWebApi.TestInt.Util;
 
 internal sealed class WebAppFactory(string connectionString) : WebApplicationFactory<Program>
 {
-    public static readonly LocalDateTime CurrentDateTimeForTests = new(2025, 01, 01, 14, 30, 00);
-    public IServiceProvider? ServiceProvider { get; private set; }
+    public static readonly LocalDateTime CurrentDateTimeForTests = new(2026, 01, 01, 14, 30, 00);
     
     public IClock TestClock =>
-        ServiceProvider?.GetService<IClock>() ??
+        Services.GetService<IClock>() ??
         throw new InvalidOperationException("Service provider not available or clock not registered");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -23,8 +22,6 @@ internal sealed class WebAppFactory(string connectionString) : WebApplicationFac
         {
             SetTestDbContext(services);
             SetTestClock(services);
-
-            ServiceProvider = services.BuildServiceProvider();
         });
     }
 

@@ -9,7 +9,7 @@ namespace LeoWebApi.TestInt.Util;
 public sealed class WebApiTestFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
-                                                              .WithImage("postgres:18")
+                                                              .WithImage("postgres:latest")
                                                               .WithDatabase("public")
                                                               .WithUsername("postgres")
                                                               .WithPassword("postgres")
@@ -78,7 +78,7 @@ public sealed class WebApiTestFixture : IAsyncLifetime
 
     private ContextScope CreateContextScope()
     {
-        var serviceProvider = Factory.ServiceProvider;
+        var serviceProvider = Factory.Services;
         if (serviceProvider is null)
         {
             throw new InvalidOperationException("Service provider not set");
