@@ -10,14 +10,15 @@ public static class PersistenceSetup
     private const string ConnectionStringName = "Postgres";
     private const string MigrationHistoryTable = "__EFMigrationsHistory";
 
-    public static void ConfigurePersistence(this IServiceCollection services,
-                                            IConfigurationManager configurationManager,
-                                            bool isDev)
+    extension(IServiceCollection services)
     {
-        ConfigureDatabase(services, configurationManager, isDev);
+        public void ConfigurePersistence(IConfigurationManager configurationManager, bool isDev)
+        {
+            ConfigureDatabase(services, configurationManager, isDev);
 
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ITransactionProvider, UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ITransactionProvider, UnitOfWork>();
+        }
     }
 
     private static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration,
