@@ -31,8 +31,7 @@ public static class PersistenceSetup
                                             .MigrationsHistoryTable(MigrationHistoryTable,
                                                                     DatabaseContext.SchemaName))
                       .ConfigureWarnings(warnings =>
-                                             warnings.Throw(RelationalEventId.MultipleCollectionIncludeWarning))
-                      .UseSnakeCaseNamingConvention();
+                                             warnings.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
 
         if (sensitiveDataLogging)
         {

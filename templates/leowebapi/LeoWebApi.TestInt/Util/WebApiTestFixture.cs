@@ -8,33 +8,28 @@ namespace LeoWebApi.TestInt.Util;
 // ReSharper disable once ClassNeverInstantiated.Global - Instantiated by xUnit
 public sealed class WebApiTestFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
-                                                              .WithImage("postgres:latest")
+    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder("postgres:latest")
                                                               .WithDatabase("public")
                                                               .WithUsername("postgres")
                                                               .WithPassword("postgres")
                                                               .Build();
 
-    private HttpClient? _client;
-    private WebAppFactory? _factory;
-    private IClock? _testClock;
-
     public HttpClient Client
     {
-        get => _client ?? throw new InvalidOperationException("Client not created");
-        private set => _client = value;
+        get => field ?? throw new InvalidOperationException("Client not created");
+        private set;
     }
-    
+
     public IClock Clock
     {
-        get => _testClock ?? throw new InvalidOperationException("Clock not created");
-        private set => _testClock = value;
+        get => field ?? throw new InvalidOperationException("Clock not created");
+        private set;
     }
 
     private WebAppFactory Factory
     {
-        get => _factory ?? throw new InvalidOperationException("Factory not created");
-        set => _factory = value;
+        get => field ?? throw new InvalidOperationException("Factory not created");
+        set;
     }
 
     public async ValueTask InitializeAsync()

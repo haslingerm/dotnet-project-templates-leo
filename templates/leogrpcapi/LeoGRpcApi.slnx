@@ -1,0 +1,23 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/backend/">
+    <Project Path="backend/LeoGRpcApi.Api.Core/LeoGRpcApi.Api.Core.csproj" />
+    <Project Path="backend/LeoGRpcApi.Api.Persistence/LeoGRpcApi.Api.Persistence.csproj" />
+    <Project Path="backend/LeoGRpcApi.Api.Shared/LeoGRpcApi.Api.Shared.csproj" />
+    <Project Path="backend/LeoGRpcApi.Api.Test/LeoGRpcApi.Api.Test.csproj" />
+    <Project Path="backend/LeoGRpcApi.Api.TestInt/LeoGRpcApi.Api.TestInt.csproj" />
+    <Project Path="backend/LeoGRpcApi.Api/LeoGRpcApi.Api.csproj" />
+  </Folder>
+  <Folder Name="/frontend/">
+    <Project Path="frontend/LeoGRpcApi.Client.Core/LeoGRpcApi.Client.Core.csproj" />
+    <Project Path="frontend/LeoGRpcApi.Client/LeoGRpcApi.Client.csproj" />
+  </Folder>
+  <Folder Name="/shared/">
+    <File Path="shared/contract.proto" />
+    <Project Path="shared/LeoGRpcApi.Shared.ApiContract/LeoGRpcApi.Shared.ApiContract.csproj" />
+  </Folder>
+</Solution>
