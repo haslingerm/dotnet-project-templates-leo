@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LeoConsole/LeoConsole.csproj" />
+  <!--#if (tests)-->
+  <Project Path="LeoConsole.Test/LeoConsole.Test.csproj" />
+  <!--#endif-->
+</Solution>
