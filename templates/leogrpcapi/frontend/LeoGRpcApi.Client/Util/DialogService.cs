@@ -52,7 +52,7 @@ internal sealed class DialogService : IDialogService
         var dialog = new TDialogWindow
         {
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            SystemDecorations = SystemDecorations.None,
+            WindowDecorations = WindowDecorations.None,
             CanResize = false,
             ShowInTaskbar = false,
             SizeToContent = SizeToContent.WidthAndHeight
