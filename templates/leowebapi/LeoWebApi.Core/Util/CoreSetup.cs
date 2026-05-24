@@ -5,10 +5,13 @@ namespace LeoWebApi.Core.Util;
 
 public static class CoreSetup
 {
-    public static void ConfigureCore(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddSingleton<IClock>(SystemClock.Instance);
-        
-        services.AddScoped<IRocketService, RocketService>();
+        public void ConfigureCore()
+        {
+            services.AddSingleton<IClock>(SystemClock.Instance);
+            
+            services.AddScoped<IRocketService, RocketService>();
+        }
     }
 }
