@@ -12,7 +12,6 @@ $script:exitCode = 0
 function Assert-ExitCode {
     if ($LASTEXITCODE -ne 0) {
         $script:exitCode = $LASTEXITCODE
-        Write-Error "Command failed with exit code $LASTEXITCODE."
     }
 }
 
@@ -65,7 +64,7 @@ function Script-Migration {
         --output $outputPath
     Assert-ExitCode
 
-    if ($LASTEXITCODE -eq 0) {
+    if ($script:exitCode -eq 0) {
         Write-Host "SQL script written to $outputPath"
     }
 }
@@ -141,7 +140,7 @@ switch ($choice)
 }
 
 if ($script:exitCode -ne 0) {
-    Write-Host "`nFailed! Exit code: $($script:exitCode)"
+    Write-Error "Failed! Exit code: $($script:exitCode)"
 } else {
     Write-Host "`nDone!"
 }
