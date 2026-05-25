@@ -7,6 +7,13 @@ param(
 
 # Define regex for migration names to skip the [dbg] logs and select the migration by checking the date at the beginning
 $MigrationNameRegex = '^\d{14}_.+'
+$script:exitCode = 0
+
+function Assert-ExitCode {
+    if ($LASTEXITCODE -ne 0) {
+        $script:exitCode = $LASTEXITCODE
+    }
+}
 
 function Add-Migration {
     param ([string]$migrationName)
@@ -19,7 +26,7 @@ function Add-Migration {
     dotnet ef migrations add $migrationName `
         --project $MigrationProject `
         --startup-project $StartupProject
-
+    Assert-ExitCode
 }
 
 function Update-Database {
@@ -27,6 +34,7 @@ function Update-Database {
     dotnet ef database update `
         --project $MigrationProject `
         --startup-project $StartupProject
+    Assert-ExitCode
 }
 
 function Script-Migration {
@@ -54,8 +62,11 @@ function Script-Migration {
         --project $MigrationProject `
         --startup-project $StartupProject `
         --output $outputPath
+    Assert-ExitCode
 
-    Write-Host "SQL script written to $outputPath"
+    if ($script:exitCode -eq 0) {
+        Write-Host "SQL script written to $outputPath"
+    }
 }
 
 function List-Migrations {
@@ -128,4 +139,10 @@ switch ($choice)
     }
 }
 
-Write-Host "`nDone!"
+if ($script:exitCode -ne 0) {
+    Write-Error "Failed! Exit code: $($script:exitCode)"
+} else {
+    Write-Host "`nDone!"
+}
+
+exit $script:exitCode
