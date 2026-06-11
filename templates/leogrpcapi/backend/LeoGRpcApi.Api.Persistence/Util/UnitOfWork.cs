@@ -69,8 +69,10 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
         }
 
         // Transaction was neither committed nor rolled back, rolling back now - silent, this is acceptable
-        await _transaction.RollbackAsync();
-        await _transaction.DisposeAsync();
+        var transaction = _transaction;
+        _transaction = null;                 
+        await transaction.RollbackAsync();
+        await transaction.DisposeAsync();
     }
 
     public void Dispose()

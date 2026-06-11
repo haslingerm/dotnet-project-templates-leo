@@ -16,8 +16,9 @@ public static class PersistenceSetup
         {
             ConfigureDatabase(services, configurationManager, isDev);
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<ITransactionProvider, UnitOfWork>();
+            services.AddScoped<UnitOfWork>();
+            services.AddScoped<ITransactionProvider>(sp => sp.GetRequiredService<UnitOfWork>());
+            services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UnitOfWork>());
         }
     }
 
