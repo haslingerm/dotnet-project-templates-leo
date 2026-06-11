@@ -8,12 +8,11 @@
     <ItemGroup>
         <PackageReference Include="Google.Protobuf" Version="3.35.0" />
         <PackageReference Include="Grpc.Core.Api" Version="2.80.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.80.0">
+        <PackageReference Include="Grpc.Tools" Version="2.81.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="FluentValidation" Version="12.1.1" />
-        <PackageReference Update="NodaTime" Version="3.3.2" />
     </ItemGroup>
 
     <ItemGroup>
