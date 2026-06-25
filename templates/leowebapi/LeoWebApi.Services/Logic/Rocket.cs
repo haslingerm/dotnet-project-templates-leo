@@ -1,6 +1,6 @@
 using LeoWebApi.Persistence.Model;
 
-namespace LeoWebApi.Core.Logic;
+namespace LeoWebApi.Services.Logic;
 
 public static class RocketExtensions
 {

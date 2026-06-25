@@ -3,7 +3,7 @@
         <OutputType>exe</OutputType>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\LeoWebApi.Core\LeoWebApi.Core.csproj"/>
+        <ProjectReference Include="..\LeoWebApi.Services\LeoWebApi.Services.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="10.0.1">

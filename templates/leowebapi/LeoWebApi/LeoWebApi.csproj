@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\LeoWebApi.Core\LeoWebApi.Core.csproj"/>
+        <ProjectReference Include="..\LeoWebApi.Services\LeoWebApi.Services.csproj" />
     </ItemGroup>
 
 </Project>

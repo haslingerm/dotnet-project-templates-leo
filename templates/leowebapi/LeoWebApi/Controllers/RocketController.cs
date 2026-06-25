@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using LeoWebApi.Core.Logic;
-using LeoWebApi.Core.Services;
+using LeoWebApi.Services.Logic;
 using LeoWebApi.Persistence;
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.Persistence.Util;
+using LeoWebApi.Services;
 using LeoWebApi.Util;
 using Microsoft.AspNetCore.Mvc;
 using OneOf;

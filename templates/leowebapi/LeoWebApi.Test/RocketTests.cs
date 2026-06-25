@@ -1,4 +1,4 @@
-﻿using LeoWebApi.Core.Logic;
+﻿using LeoWebApi.Services.Logic;
 using LeoWebApi.Persistence.Model;
 
 namespace LeoWebApi.Test;

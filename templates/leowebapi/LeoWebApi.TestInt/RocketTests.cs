@@ -1,6 +1,5 @@
 using System.Net;
 using LeoWebApi.Controllers;
-using LeoWebApi.Core.Logic;
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.TestInt.Util;
 

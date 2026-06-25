@@ -1,9 +1,8 @@
-using LeoWebApi.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LeoWebApi.Core.Util;
+namespace LeoWebApi.Services.Util;
 
-public static class CoreSetup
+public static class ServicesSetup
 {
     extension(IServiceCollection services)
     {
