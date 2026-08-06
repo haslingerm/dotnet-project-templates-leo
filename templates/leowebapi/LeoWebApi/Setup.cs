@@ -1,3 +1,5 @@
+using FluentValidation;
+using LeoWebApi.Endpoints;
 using LeoWebApi.Services.Util;
 using LeoWebApi.Persistence.Util;
 using LeoWebApi.Util;
@@ -8,6 +10,32 @@ namespace LeoWebApi;
 public static class Setup
 {
     public const string CorsPolicyName = "DefaultCorsPolicy";
+
+    /// <summary>
+    ///     Aligns FluentValidation with the JSON contract
+    /// </summary>
+    public static void ConfigureValidation()
+    {
+        ValidatorOptions.Global.PropertyNameResolver = (_, member, _) => member is null
+        ? null
+        : ValidationNaming.ToPropertyName(member.Name);
+
+        ValidatorOptions.Global.DisplayNameResolver = (_, member, _) => member is null
+        ? null
+        : ValidationNaming.ToDisplayName(member.Name);
+    }
+
+    extension(IEndpointRouteBuilder app)
+    {
+        /// <summary>
+        ///     Maps the endpoints of every resource of this API.
+        ///     Add one call per resource here - no reflection!
+        /// </summary>
+        public void MapApplicationEndpoints()
+        {
+            app.MapRocketEndpoints();
+        }
+    }
 
     extension(IServiceCollection services)
     {
@@ -65,6 +93,16 @@ public static class Setup
             }));
 
             Log.Logger.Debug("Added CORS policy with client origin {ClientOrigin}", settings.ClientOrigin);
+        }
+
+        /// <summary>
+        ///     Registers the problem details services, so that unhandled exceptions are answered with the same
+        ///     error shape as failed validations
+        /// </summary>
+        public void ConfigureProblemDetails()
+        {
+            services.AddProblemDetails();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
         }
 
         public void ConfigureAdditionalRouteConstraints()
