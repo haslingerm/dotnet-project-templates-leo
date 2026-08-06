@@ -48,15 +48,12 @@ public static class RocketEndpoints
                                notFound => TypedResults.NotFound());
     }
 
-    private static async ValueTask<Ok<AllRocketsResponse>> GetAllRocketsAsync(
+    private static async ValueTask<Ok<IEnumerable<RocketDto>>> GetAllRocketsAsync(
         [FromServices] IRocketService rocketService)
     {
         IReadOnlyCollection<Rocket> rockets = await rocketService.GetAllRocketsAsync();
 
-        return TypedResults.Ok(new AllRocketsResponse
-        {
-            Rockets = rockets.Select(RocketDto.FromRocket)
-        });
+        return TypedResults.Ok(rockets.Select(RocketDto.FromRocket));
     }
 
     private static async ValueTask<Results<CreatedAtRoute<RocketDto>, ValidationProblem>>
@@ -111,10 +108,10 @@ public static class RocketEndpoints
 
 public sealed class AddRocketRequest
 {
-    public required string ModelName { get; set; }
-    public required string Manufacturer { get; set; }
-    public double MaxThrust { get; set; }
-    public long PayloadDeltaV { get; set; }
+    public required string ModelName { get; init; }
+    public required string Manufacturer { get; init; }
+    public double MaxThrust { get; init; }
+    public long PayloadDeltaV { get; init; }
 
     public sealed class Validator : AbstractValidator<AddRocketRequest>
     {
@@ -128,18 +125,13 @@ public sealed class AddRocketRequest
     }
 }
 
-public sealed class AllRocketsResponse
-{
-    public required IEnumerable<RocketDto> Rockets { get; set; }
-}
-
 public sealed class RocketDto
 {
-    public int Id { get; set; }
-    public required string ModelName { get; set; }
-    public required string Manufacturer { get; set; }
-    public double MaxThrust { get; set; }
-    public long PayloadDeltaV { get; set; }
+    public int Id { get; init; }
+    public required string ModelName { get; init; }
+    public required string Manufacturer { get; init; }
+    public double MaxThrust { get; init; }
+    public long PayloadDeltaV { get; init; }
 
     public static RocketDto FromRocket(Rocket rocket) =>
         new()

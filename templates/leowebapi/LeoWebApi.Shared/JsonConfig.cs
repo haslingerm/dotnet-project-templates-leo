@@ -10,6 +10,8 @@ public static class JsonConfig
     {
         options.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
         options.PropertyNameCaseInsensitive = true;
+        options.RespectNullableAnnotations = true;
+        options.RespectRequiredConstructorParameters = true;
         options.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         options.Converters.Add(new JsonStringEnumConverter());

@@ -16,18 +16,32 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
                                                 CancellationToken cancellationToken)
     {
+        if (exception is BadHttpRequestException badRequestException)
+        {
+            logger.LogInformation(exception, "A malformed request to {Path} was rejected", httpContext.Request.Path);
+
+            return await WriteProblemDetailsAsync(httpContext, badRequestException.StatusCode,
+                                                  "The request could not be processed");
+        }
+
         logger.LogError(exception, "An unhandled exception occurred while processing the request to {Path}",
                         httpContext.Request.Path);
 
-        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        return await WriteProblemDetailsAsync(httpContext, StatusCodes.Status500InternalServerError,
+                                              "An unexpected error occurred");
+    }
+
+    private async ValueTask<bool> WriteProblemDetailsAsync(HttpContext httpContext, int statusCode, string title)
+    {
+        httpContext.Response.StatusCode = statusCode;
 
         return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             ProblemDetails =
             {
-                Title = "An unexpected error occurred",
-                Status = StatusCodes.Status500InternalServerError
+                Title = title,
+                Status = statusCode
             }
         });
     }

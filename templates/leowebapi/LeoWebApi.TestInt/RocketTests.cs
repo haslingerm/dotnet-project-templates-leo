@@ -8,7 +8,7 @@ namespace LeoWebApi.TestInt;
 public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBase(webApiFixture)
 {
     // Note: make sure you have created a migration before running the tests!
-    
+
     [Fact]
     public async ValueTask GetAllRockets_ExistingRockets_Success()
     {
@@ -40,13 +40,12 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
         var response = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions, TestCancellationToken);
+        IReadOnlyList<RocketDto>? content
+            = await response.Content.ReadFromJsonAsync<IReadOnlyList<RocketDto>>(JsonOptions, TestCancellationToken);
 
-        content.Should().NotBeNull();
-        content.Rockets.Should().NotBeEmpty()
-                .And.HaveCount(2);
-        content.Rockets.Should().ContainSingle(r => r.Manufacturer == Manufacturer1 && r.ModelName == ModelName1);
-        content.Rockets.Should().ContainSingle(r => r.Manufacturer == Manufacturer2 && r.ModelName == ModelName2);
+        content.Should().NotBeNull().And.HaveCount(2);
+        content.Should().ContainSingle(r => r.Manufacturer == Manufacturer1 && r.ModelName == ModelName1);
+        content.Should().ContainSingle(r => r.Manufacturer == Manufacturer2 && r.ModelName == ModelName2);
     }
 
     [Fact]
@@ -70,24 +69,24 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
         var content = await response.Content.ReadFromJsonAsync<RocketDto>(TestCancellationToken);
 
         content.Should().NotBeNull();
-        ValidateRocket(content);
+
+        // the id is assigned by the database
+        var expectedRocket = new
+        {
+            Manufacturer,
+            ModelName,
+            MaxThrust,
+            PayloadDeltaV
+        };
+
+        content.Should().BeEquivalentTo(expectedRocket);
+        content.Id.Should().BePositive();
 
         response = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
-        var allRocketsContent = await response.Content.ReadFromJsonAsync<AllRocketsResponse>(JsonOptions, TestCancellationToken);
+        IReadOnlyList<RocketDto>? allRocketsContent
+            = await response.Content.ReadFromJsonAsync<IReadOnlyList<RocketDto>>(JsonOptions, TestCancellationToken);
 
-        allRocketsContent.Should().NotBeNull();
-        allRocketsContent.Rockets.Should().NotBeEmpty()
-                          .And.HaveCount(1);
-        ValidateRocket(allRocketsContent.Rockets.First());
-
-        return;
-
-        void ValidateRocket(RocketDto rocket)
-        {
-            rocket.Manufacturer.Should().Be(Manufacturer);
-            rocket.ModelName.Should().Be(ModelName);
-            rocket.MaxThrust.Should().Be(MaxThrust);
-            rocket.PayloadDeltaV.Should().Be(PayloadDeltaV);
-        }
+        allRocketsContent.Should().ContainSingle()
+                         .Which.Should().BeEquivalentTo(expectedRocket);
     }
 }
