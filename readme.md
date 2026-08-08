@@ -33,8 +33,8 @@ Console Application
 WebAPI (REST) Application
 
 - Includes:
-  - Startup project with controller
-  - Core project with business logic & services
+  - Startup project with minimal API endpoints
+  - Services project with business logic & services
   - Persistence project with data access
   - Shared project with utility classes
   - Unit test project
