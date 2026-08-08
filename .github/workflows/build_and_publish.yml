@@ -30,6 +30,8 @@ jobs:
       id: nuget-login
       uses: NuGet/login@v1
       with:
-        user: ${{ secrets.NUGET_USER }}
+        # NUGET_USER is just the public nuget.org account name, so it can be configured
+        # either as a repository/organization variable or as a secret.
+        user: ${{ vars.NUGET_USER || secrets.NUGET_USER }}
     - name: Publish
       run: dotnet nuget push nupkgs/*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
