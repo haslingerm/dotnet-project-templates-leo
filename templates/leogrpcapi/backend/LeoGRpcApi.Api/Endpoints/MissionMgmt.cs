@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
-using LeoGRpcApi.Api.Core.Services;
 using LeoGRpcApi.Api.Persistence.Model;
 using LeoGRpcApi.Api.Persistence.Util;
+using LeoGRpcApi.Api.Services;
 using LeoGRpcApi.Api.Util;
 using LeoGRpcApi.Shared.ApiContract;
 using LeoGRpcApi.Shared.ApiContract.Validation;
@@ -12,8 +12,7 @@ namespace LeoGRpcApi.Api.Endpoints;
 
 public sealed class MissionMgmtEndpoint(
     IMissionService missionService,
-    ITransactionProvider transaction,
-    ILogger<MissionMgmtEndpoint> logger)
+    ITransactionProvider transaction)
     : MissionMgmt.MissionMgmtBase
 {
     public override async Task<MissionDto> CreateMission(CreateMissionRequest request,
@@ -21,22 +20,15 @@ public sealed class MissionMgmtEndpoint(
     {
         RpcHelper.ThrowIfInvalid<CreateMissionRequest, CreateMissionRequestValidator>(request);
 
-        try
-        {
-            await transaction.BeginTransactionAsync();
-            string? desc = request.HasDescription ? request.Description : null;
-            var mission = await missionService.CreateMissionAsync(request.Title, desc, request.Dangerousness);
+        await transaction.BeginTransactionAsync();
 
-            await transaction.CommitAsync();
+        string? desc = request.HasDescription ? request.Description : null;
+        var mission = await missionService.CreateMissionAsync(request.Title, desc, request.Dangerousness);
 
-            return mission.ToDto();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create mission");
+        // committing is explicit in the success case, rolling back is the default
+        await transaction.CommitAsync();
 
-            throw RpcHelper.InternalError();
-        }
+        return mission.ToDto();
     }
 
     public override async Task<GetAllMissionsResponse> GetAllMissions(GetAllRequest request, ServerCallContext context)
@@ -54,28 +46,20 @@ public sealed class MissionMgmtEndpoint(
     {
         RpcHelper.ThrowIfInvalid<UpdateMissionRequest, UpdateMissionRequestValidator>(request);
 
-        try
-        {
-            await transaction.BeginTransactionAsync();
-            string? desc = request.HasDescription ? request.Description : null;
-            OneOf<Success, NotFound> updateResult
-                = await missionService.UpdateMissionAsync(request.Id, desc, request.Dangerousness);
+        await transaction.BeginTransactionAsync();
 
-            return await updateResult.Match(async success =>
-                                            {
-                                                await transaction.CommitAsync();
+        string? desc = request.HasDescription ? request.Description : null;
+        OneOf<Success, NotFound> updateResult
+            = await missionService.UpdateMissionAsync(request.Id, desc, request.Dangerousness);
 
-                                                return new UpdateMissionResponse();
-                                            },
-                                            notFound => throw RpcHelper.NotFound());
-        }
-        // We might throw a NotFound RpcException here as a normal code path, so catching that right away again does not make sense
-        catch (Exception ex) when (ex is not RpcException)
-        {
-            logger.LogError(ex, "Failed to update mission");
+        return await updateResult.Match(async success =>
+                                        {
+                                            await transaction.CommitAsync();
 
-            throw RpcHelper.InternalError();
-        }
+                                            return new UpdateMissionResponse();
+                                        },
+                                        // left uncommitted on purpose
+                                        notFound => throw RpcHelper.NotFound());
     }
 
     public override async Task<AssignMissionResponse> AssignMission(AssignMissionRequest request,
@@ -83,33 +67,24 @@ public sealed class MissionMgmtEndpoint(
     {
         RpcHelper.ThrowIfInvalid<AssignMissionRequest, AssignMissionRequestValidator>(request);
 
-        try
+        await transaction.BeginTransactionAsync();
+
+        OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
+            assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
+        var result = await assignMissionResult.Match<ValueTask<MissionAssignmentResult>>(async success =>
+             {
+                 await transaction.CommitAsync();
+
+                 return MissionAssignmentResult.Success;
+             },
+             missionNotFound => ValueTask.FromResult(MissionAssignmentResult.MissionNotFound),
+             ninjaNotFound => ValueTask.FromResult(MissionAssignmentResult.NinjaNotFound),
+             ninjaBusy => ValueTask.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
+
+        return new AssignMissionResponse
         {
-            await transaction.BeginTransactionAsync();
-
-            OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
-                assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
-            var result = await assignMissionResult.Match<ValueTask<MissionAssignmentResult>>(async success =>
-                 {
-                     await transaction.CommitAsync();
-
-                     return MissionAssignmentResult.Success;
-                 },
-                 missionNotFound => ValueTask.FromResult(MissionAssignmentResult.MissionNotFound),
-                 ninjaNotFound => ValueTask.FromResult(MissionAssignmentResult.NinjaNotFound),
-                 ninjaBusy => ValueTask.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
-
-            return new AssignMissionResponse
-            {
-                Result = result
-            };
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to assign mission");
-
-            throw RpcHelper.InternalError();
-        }
+            Result = result
+        };
     }
 
     public override async Task<DeleteMissionResponse> DeleteMission(DeleteMissionRequest request,
@@ -117,29 +92,21 @@ public sealed class MissionMgmtEndpoint(
     {
         RpcHelper.ThrowIfInvalid<DeleteMissionRequest, DeleteMissionRequestValidator>(request);
 
-        try
+        await transaction.BeginTransactionAsync();
+
+        OneOf<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
+
+        bool result = await deleteResult.Match<ValueTask<bool>>(async success =>
+                                                                {
+                                                                    await transaction.CommitAsync();
+
+                                                                    return true;
+                                                                },
+                                                                notFound => ValueTask.FromResult(false));
+
+        return new DeleteMissionResponse
         {
-            await transaction.BeginTransactionAsync();
-            OneOf<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
-
-            bool result = await deleteResult.Match<ValueTask<bool>>(async success =>
-                                                                    {
-                                                                        await transaction.CommitAsync();
-
-                                                                        return true;
-                                                                    },
-                                                                    notFound => ValueTask.FromResult(false));
-
-            return new DeleteMissionResponse
-            {
-                Success = result
-            };
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete mission");
-
-            throw RpcHelper.InternalError();
-        }
+            Success = result
+        };
     }
 }

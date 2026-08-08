@@ -3,7 +3,7 @@ using LeoGRpcApi.Api.Persistence.Util;
 using OneOf;
 using OneOf.Types;
 
-namespace LeoGRpcApi.Api.Core.Services;
+namespace LeoGRpcApi.Api.Services;
 
 /// <summary>
 ///     Provides methods to manage missions

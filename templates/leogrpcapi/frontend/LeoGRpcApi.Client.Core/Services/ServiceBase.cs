@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Grpc.Core;
 using LeoGRpcApi.Client.Core.Util;
+using LeoGRpcApi.Shared.ApiContract.Validation;
 
 namespace LeoGRpcApi.Client.Core.Services;
 
@@ -26,11 +27,9 @@ internal abstract class ServiceBase<TClient>(GrpcClientFactory clientFactory)
     /// <typeparam name="TValidator">Type of the validator</typeparam>
     protected static void ThrowIfInvalid<TRequest, TValidator>(TRequest request)
         where TValidator : AbstractValidator<TRequest>, new()
-    {
-        var validator = new TValidator();
-        ThrowIfInvalid(request, validator);
-    }
-    
+        where TRequest : notnull =>
+        RequestValidation.ThrowIfInvalid<TRequest, TValidator>(request);
+
     /// <summary>
     ///     Throws a <see cref="RpcException" /> with <see cref="StatusCode.InvalidArgument" /> if the request is invalid
     ///     according to the specified validator
@@ -38,19 +37,7 @@ internal abstract class ServiceBase<TClient>(GrpcClientFactory clientFactory)
     /// <param name="request">Request to validate</param>
     /// <param name="validator">Validator to use</param>
     /// <typeparam name="TRequest">Type of the request</typeparam>
-    /// <typeparam name="TValidator">Type of the validator</typeparam>
-    protected static void ThrowIfInvalid<TRequest, TValidator>(TRequest request, TValidator validator)
-        where TValidator : AbstractValidator<TRequest>
-    {
-        var result = validator.Validate(request);
-
-        if (result.IsValid)
-        {
-            return;
-        }
-
-        var errorMessage = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));
-
-        throw new RpcException(new Status(StatusCode.InvalidArgument, errorMessage));
-    }
+    protected static void ThrowIfInvalid<TRequest>(TRequest request, IValidator<TRequest> validator)
+        where TRequest : notnull =>
+        RequestValidation.ThrowIfInvalid(request, validator);
 }

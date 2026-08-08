@@ -1,42 +1,32 @@
-using LeoMiniApi.Core;
+using LeoMiniApi;
+using LeoMiniApi.Util;
+using Microsoft.AspNetCore.Http.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
+bool isDev = builder.Environment.IsDevelopment();
+
+builder.Services.AddApplicationServices();
 builder.Services.AddOpenApi();
-builder.Services.RegisterServices();
-builder.Services.AddCors();
 builder.Services.ConfigureCors();
-builder.Services.ConfigureServices(builder.Environment.IsDevelopment());
+builder.Services.ConfigureProblemDetails();
+builder.Services.ConfigureHttpJsonOptions(o => ConfigureJsonSerialization(o, isDev));
 
 var app = builder.Build();
+app.UseCors(Setup.CorsPolicyName);
+app.UseExceptionHandler();
+app.MapApplicationEndpoints();
 
-if(builder.Environment.IsDevelopment())
+if (isDev)
 {
     app.MapOpenApi();
 }
 
-app.UseCors(Setup.CorsPolicyName);
-
-app.MapGet("/hello/{name}", (string? name, IClock clock) =>
-   {
-       if (string.IsNullOrWhiteSpace(name))
-       {
-           return Results.BadRequest();
-       }
-
-       var now = clock.GetCurrentInstant();
-
-       return Results.Ok(new Greeting(name, now));
-   })
-   .Produces<Greeting>(StatusCodes.Status200OK)
-   .Produces(StatusCodes.Status400BadRequest)
-   .WithName("Greetings");
-
 await app.RunAsync();
 
-internal sealed class Greeting(string name, Instant timestamp)
+return;
+
+static void ConfigureJsonSerialization(JsonOptions options, bool isDev)
 {
-    public string Message => $"Hello, {name}!";
-    public Instant Timestamp => timestamp;
+    JsonConfig.ConfigureJsonSerialization(options.SerializerOptions, isDev);
 }

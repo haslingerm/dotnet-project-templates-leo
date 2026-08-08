@@ -1,17 +1,17 @@
-using LeoWebApi.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LeoWebApi.Core.Util;
+namespace LeoGRpcApi.Api.Services.Util;
 
-public static class CoreSetup
+public static class ServicesSetup
 {
     extension(IServiceCollection services)
     {
         public void ConfigureCore()
         {
             services.AddSingleton<IClock>(SystemClock.Instance);
-            
-            services.AddScoped<IRocketService, RocketService>();
+
+            services.AddScoped<INinjaService, NinjaService>();
+            services.AddScoped<IMissionService, MissionService>();
         }
     }
 }

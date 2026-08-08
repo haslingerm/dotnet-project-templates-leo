@@ -1,4 +1,4 @@
-namespace LeoWebApi.Core.Util;
+namespace LeoWebApi.Services.Util;
 
 public sealed class Settings
 {

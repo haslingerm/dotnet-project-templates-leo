@@ -1,6 +1,5 @@
 using LeoGRpcApi.Api;
-using LeoGRpcApi.Api.Endpoints;
-using LeoGRpcApi.Api.Util;
+using LeoGRpcApi.Shared.ApiContract.Validation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,17 +18,11 @@ builder.Services.LoadAndConfigureSettings(configurationManager);
 
 builder.AddLogging();
 builder.Services.AddApplicationServices(configurationManager, isDev);
-builder.Services.AddGrpc();
+builder.Services.ConfigureGrpc(isDev);
+ValidationSetup.ConfigureValidation();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-// adding the gRPC endpoints
-app.MapGrpcService<NinjaMgmtEndpoint>();
-app.MapGrpcService<MissionMgmtEndpoint>();
+app.MapApplicationEndpoints();
 
 await app.RunAsync();
-
-// used for integration testing
-public partial class Program;

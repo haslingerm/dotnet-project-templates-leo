@@ -1,4 +1,4 @@
-namespace LeoGRpcApi.Api.Core.Util;
+namespace LeoGRpcApi.Api.Services.Util;
 
 public sealed class Settings
 {
