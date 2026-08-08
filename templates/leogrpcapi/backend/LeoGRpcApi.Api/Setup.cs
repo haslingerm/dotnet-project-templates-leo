@@ -1,11 +1,22 @@
-using LeoGRpcApi.Api.Core.Util;
+using LeoGRpcApi.Api.Endpoints;
+using LeoGRpcApi.Api.Services.Util;
 using LeoGRpcApi.Api.Persistence.Util;
+using LeoGRpcApi.Api.Util;
 using Serilog;
 
 namespace LeoGRpcApi.Api;
 
 public static class Setup
 {
+    extension(IEndpointRouteBuilder app)
+    {
+        public void MapApplicationEndpoints()
+        {
+            app.MapGrpcService<NinjaMgmtEndpoint>();
+            app.MapGrpcService<MissionMgmtEndpoint>();
+        }
+    }
+
     extension(IServiceCollection services)
     {
         public void AddApplicationServices(IConfigurationManager configurationManager,
@@ -26,6 +37,17 @@ public static class Setup
             configSection.Bind(settings);
 
             return settings;
+        }
+        
+        public void ConfigureGrpc(bool isDev)
+        {
+            services.AddGrpc(options =>
+            {
+                options.Interceptors.Add<ExceptionInterceptor>();
+
+                // exception details would be sent to the client, so this must never be on outside of development
+                options.EnableDetailedErrors = isDev;
+            });
         }
     }
 

@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using LeoGRpcApi.Client.Core.Util;
 using LeoGRpcApi.Client.Util;
+using LeoGRpcApi.Shared.ApiContract.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -36,7 +37,8 @@ internal sealed class Program
                // adding a message bus
                .AddSingleton<IMessenger>(_ => WeakReferenceMessenger.Default);
         ConfigureLogging(builder);
-        
+        ValidationSetup.ConfigureValidation();
+
         using var host = builder.Build();
         _serviceProvider = host.Services;
 

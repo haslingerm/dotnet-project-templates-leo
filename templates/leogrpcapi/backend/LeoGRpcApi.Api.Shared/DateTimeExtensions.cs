@@ -2,29 +2,29 @@ namespace LeoGRpcApi.Api.Shared;
 
 public static class DateTimeExtensions
 {
-    extension(Instant self)
+    extension(IClock clock)
     {
-        public ZonedDateTime ToZonedDateTime() => self.InZone(Const.TimeZone);
+        public ZonedDateTime LocalNow => clock.GetCurrentInstant().ToZonedDateTime();
+        public LocalDateTime LocalDateTime => clock.LocalNow.LocalDateTime;
+        public LocalTime LocalTime => clock.LocalDateTime.TimeOfDay;
+        public LocalDate LocalDate => clock.LocalDateTime.Date;
     }
 
-    extension(IClock self)
+    extension(Instant instant)
     {
-        public ZonedDateTime LocalNow => self.GetCurrentInstant().ToZonedDateTime();
-        public LocalDateTime LocalDateTime => self.LocalNow.LocalDateTime;
-        public LocalTime LocalTime => self.LocalDateTime.TimeOfDay;
-        public LocalDate LocalDate => self.LocalDateTime.Date;
+        public ZonedDateTime ToZonedDateTime() => instant.InZone(Const.TimeZone);
     }
 
-    extension(LocalDateTime self)
+    extension(LocalDateTime localDateTime)
     {
-        public Instant ToInstantInZone() => self.Date.ToInstantInZone(self.TimeOfDay);
+        public Instant ToInstantInZone() => localDateTime.Date.ToInstantInZone(localDateTime.TimeOfDay);
     }
 
-    extension(LocalDate self)
+    extension(LocalDate localDate)
     {
         public Instant ToInstantInZone(LocalTime? atTime = null)
         {
-            var midnight = self.AtStartOfDayInZone(Const.TimeZone);
+            var midnight = localDate.AtStartOfDayInZone(Const.TimeZone);
             var effectiveZonedDateTime = atTime.HasValue
                 ? midnight.Date.At(atTime.Value).InZoneLeniently(Const.TimeZone)
                 : midnight;

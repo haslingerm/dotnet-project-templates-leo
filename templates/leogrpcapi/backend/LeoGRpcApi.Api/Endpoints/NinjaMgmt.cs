@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
-using LeoGRpcApi.Api.Core.Services;
 using LeoGRpcApi.Api.Persistence.Model;
 using LeoGRpcApi.Api.Persistence.Util;
+using LeoGRpcApi.Api.Services;
 using LeoGRpcApi.Api.Util;
 using LeoGRpcApi.Shared.ApiContract;
 using LeoGRpcApi.Shared.ApiContract.Validation;
@@ -15,35 +15,28 @@ namespace LeoGRpcApi.Api.Endpoints;
 // Mind, that some types (e.g. enums) are needed not only in the API layer but also in persistence if you do not want to add a mapping step.
 public sealed class NinjaMgmtEndpoint(
     INinjaService ninjaService,
-    ITransactionProvider transaction,
-    ILogger<NinjaMgmtEndpoint> logger)
+    ITransactionProvider transaction)
     : NinjaMgmt.NinjaMgmtBase
 {
     public override async Task<CreateNinjaResponse>
         CreateNinja(CreateNinjaRequest request, ServerCallContext context)
     {
         RpcHelper.ThrowIfInvalid<CreateNinjaRequest, CreateNinjaRequestValidator>(request);
-        try
+
+        await transaction.BeginTransactionAsync();
+
+        var ninja = await ninjaService.CreateNinjaAsync(request.Rank,
+                                                        request.CodeName,
+                                                        request.WeaponProficiencies.ToList(),
+                                                        request.SpecialSkills.ToList());
+
+        // committing is explicit in the success case, rolling back is the default
+        await transaction.CommitAsync();
+
+        return new CreateNinjaResponse
         {
-            await transaction.BeginTransactionAsync();
-            var ninja = await ninjaService.CreateNinjaAsync(request.Rank,
-                                                            request.CodeName,
-                                                            request.WeaponProficiencies.ToList(),
-                                                            request.SpecialSkills.ToList());
-
-            await transaction.CommitAsync();
-
-            return new CreateNinjaResponse
-            {
-                Id = ninja.Id
-            };
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create ninja");
-
-            throw RpcHelper.InternalError();
-        }
+            Id = ninja.Id
+        };
     }
 
     public override async Task<GetAllNinjaIdsResponse> GetAllNinjaIds(GetAllRequest request, ServerCallContext context)

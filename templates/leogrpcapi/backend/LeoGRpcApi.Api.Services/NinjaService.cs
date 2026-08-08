@@ -4,7 +4,7 @@ using LeoGRpcApi.Shared.ApiContract;
 using OneOf;
 using OneOf.Types;
 
-namespace LeoGRpcApi.Api.Core.Services;
+namespace LeoGRpcApi.Api.Services;
 
 /// <summary>
 ///     Provides methods to manage ninjas

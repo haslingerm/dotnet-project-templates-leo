@@ -3,7 +3,7 @@
         <OutputType>exe</OutputType>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\LeoGRpcApi.Api.Core\LeoGRpcApi.Api.Core.csproj"/>
+        <ProjectReference Include="..\LeoGRpcApi.Api.Services\LeoGRpcApi.Api.Services.csproj"/>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="10.0.1">
