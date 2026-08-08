@@ -17,6 +17,7 @@
     <Project Path="frontend/LeoGRpcApi.Client/LeoGRpcApi.Client.csproj" />
   </Folder>
   <Folder Name="/shared/">
+    <File Path="Directory.Build.props" />
     <File Path="shared/contract.proto" />
     <Project Path="shared/LeoGRpcApi.Shared.ApiContract/LeoGRpcApi.Shared.ApiContract.csproj" />
   </Folder>
