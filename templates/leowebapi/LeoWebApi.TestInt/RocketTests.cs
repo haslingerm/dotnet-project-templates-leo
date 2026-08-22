@@ -89,4 +89,38 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
         allRocketsContent.Should().ContainSingle()
                          .Which.Should().BeEquivalentTo(expectedRocket);
     }
+
+    [Fact]
+    public async ValueTask AddRocket_InvalidRequest()
+    {
+        var response = await ApiClient.PostAsJsonAsync("api/rockets", new AddRocketRequest
+        {
+            Manufacturer = string.Empty,
+            ModelName = string.Empty,
+            MaxThrust = 0D,
+            PayloadDeltaV = -1
+        }, JsonOptions, TestCancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        // failed validation is reported as RFC 9457 problem details
+        response.Content.Headers.ContentType?.MediaType.Should().Be("application/problem+json");
+
+        var problemDetails =
+            await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>(JsonOptions, TestCancellationToken);
+
+        problemDetails.Should().NotBeNull();
+        problemDetails.Status.Should().Be((int) HttpStatusCode.BadRequest);
+
+        // the errors are keyed by the camelCase property names of the JSON contract
+        problemDetails.Errors.Should().ContainKeys("modelName", "manufacturer", "maxThrust", "payloadDeltaV");
+
+        // the endpoint validates before acting, so no data should have been persisted
+        var allRocketsResponse = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
+        IReadOnlyList<RocketDto>? allRocketsContent =
+            await allRocketsResponse.Content.ReadFromJsonAsync<IReadOnlyList<RocketDto>>(JsonOptions,
+                 TestCancellationToken);
+
+        allRocketsContent.Should().NotBeNull().And.BeEmpty();
+    }
 }

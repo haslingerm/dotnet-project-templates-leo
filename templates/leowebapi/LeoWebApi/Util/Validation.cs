@@ -1,66 +1,36 @@
-using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace LeoWebApi.Util;
 
 /// <summary>
 ///     Request validation helpers for the API layer.
-///     Validation is always explicit: an endpoint validates its request and decides what to return, nothing runs
-///     automatically behind the scenes.
+///     Validation is always explicit: an endpoint creates its validator, validates its request and decides what to
+///     return, nothing runs automatically behind the scenes.
 /// </summary>
 public static class Validation
 {
-    /// <summary>
-    ///     Validates the given request with the specified validator
-    /// </summary>
-    /// <param name="request">The request to validate</param>
-    /// <typeparam name="TValidator">The validator class to use, has to have a parameterless constructor</typeparam>
-    /// <typeparam name="TRequest">The request class</typeparam>
-    /// <returns>True if the request object passed validation; false otherwise</returns>
-    public static bool IsValid<TValidator, TRequest>(TRequest request)
-    where TValidator : AbstractValidator<TRequest>, new()
-    where TRequest : notnull =>
-    IsValid(request, new TValidator(), out _);
-
-    /// <summary>
-    ///     Validates the given request with the specified validator and provides the validation errors
-    /// </summary>
-    /// <param name="request">The request to validate</param>
-    /// <param name="validationErrors">
-    ///     If validation errors occur, they are stored in this out parameter, keyed by property name
-    /// </param>
-    /// <typeparam name="TValidator">The validator class to use, has to have a parameterless constructor</typeparam>
-    /// <typeparam name="TRequest">The request class</typeparam>
-    /// <returns>True if the request object passed validation; false otherwise</returns>
-    public static bool IsValid<TValidator, TRequest>(TRequest request,
-                                                     [NotNullWhen(false)]
-                                                     out IDictionary<string, string[]>? validationErrors)
-    where TValidator : AbstractValidator<TRequest>, new()
-    where TRequest : notnull =>
-    IsValid(request, new TValidator(), out validationErrors);
-
-    /// <summary>
-    ///     Validates the given request with the provided validator and provides the validation errors.
-    ///     Use this overload for validators that need dependencies.
-    /// </summary>
-    /// <param name="request">The request to validate</param>
-    /// <param name="validator">The validator instance to use</param>
-    /// <param name="validationErrors">
-    ///     If validation errors occur, they are stored in this out parameter, keyed by property name
-    /// </param>
-    /// <typeparam name="TRequest">The request class</typeparam>
-    /// <returns>True if the request object passed validation; false otherwise</returns>
-    public static bool IsValid<TRequest>(TRequest request, IValidator<TRequest> validator,
-                                         [NotNullWhen(false)] out IDictionary<string, string[]>? validationErrors)
-    where TRequest : notnull
+    extension<TRequest>(IValidator<TRequest> validator)
+        where TRequest : notnull
     {
-        var validationResult = validator.Validate(request);
+        /// <summary>
+        ///     Validates the given request and provides the result to return when it is invalid.
+        ///     The validator is created by the endpoint, so a validator needing extra information simply takes it
+        ///     through its constructor.
+        /// </summary>
+        /// <param name="request">The request to validate</param>
+        /// <returns>
+        ///     The <see cref="ValidationProblem" /> the endpoint has to return if the request is invalid;
+        ///     null if the request passed validation
+        /// </returns>
+        public ValidationProblem? Check(TRequest request)
+        {
+            var validationResult = validator.Validate(request);
 
-        validationErrors = validationResult.IsValid
-        ? null
-        : validationResult.ToDictionary();
-
-        return validationResult.IsValid;
+            return validationResult.IsValid
+                ? null
+                : TypedResults.ValidationProblem(validationResult.ToDictionary());
+        }
     }
 
     /// <summary>
@@ -71,8 +41,8 @@ public static class Validation
     /// <param name="message">The message describing why the check failed</param>
     /// <returns>The validation errors, keyed by property name</returns>
     public static IDictionary<string, string[]> Failure(string propertyName, string message) =>
-    new Dictionary<string, string[]>
-    {
-        [ValidationNaming.ToPropertyName(propertyName)] = [message]
-    };
+        new Dictionary<string, string[]>
+        {
+            [ValidationNaming.ToPropertyName(propertyName)] = [message]
+        };
 }

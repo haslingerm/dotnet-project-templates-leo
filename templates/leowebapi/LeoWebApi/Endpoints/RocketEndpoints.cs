@@ -61,11 +61,9 @@ public static class RocketEndpoints
                        [FromServices] IRocketService rocketService,
                        [FromServices] ITransactionProvider transaction)
     {
-        if (!Validation.IsValid<AddRocketRequest.Validator, AddRocketRequest>(addRequest,
-                                                                              out IDictionary<string, string[]>?
-                                                                                  validationErrors))
+        if (new AddRocketRequest.Validator().Check(addRequest) is { } validationProblem)
         {
-            return TypedResults.ValidationProblem(validationErrors);
+            return validationProblem;
         }
 
         await transaction.BeginTransactionAsync();
