@@ -23,7 +23,7 @@ jobs:
       - name: build
         run: dotnet build --no-restore
       - name: test
-        run: dotnet test --filter "Category!=SkipOnGitHubActions" --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal -- --filter-not-trait "Category=SkipOnGitHubActions"
       - name: publish
         run: dotnet publish -c Release -r linux-x64 -o release --self-contained true
         working-directory: ${{env.APP_DIR}}
