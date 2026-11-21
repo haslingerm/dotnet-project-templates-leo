@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using FluentValidation;
+using LeoUnion;
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.Persistence.Util;
 using LeoWebApi.Services;
 using LeoWebApi.Util;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using LeoUnion;
 // the service markers would clash with ASP.NET Core's typed results (TypedResults.NotFound())
 using ServiceNotFound = LeoUnion.Markers.NotFound;
 using ServiceSuccess = LeoUnion.Markers.Success;
@@ -92,7 +92,7 @@ public static class RocketEndpoints
         Union<ServiceSuccess, ServiceNotFound> deleteResult = await rocketService.DeleteRocketAsync(id);
 
         // A switch statement, because the success branch also commits. The compiler does not know that it handles
-        // every case, so it needs the default guard; that guard is no case: LA0003 still checks that all are handled.
+        // every case, so it needs a default section - only a guard, not a handled case: LA0003 still checks them all.
         switch (deleteResult)
         {
             case ServiceSuccess:

@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net11.0</TargetFramework>
         <OutputType>exe</OutputType>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<!-- Runtime async: async methods are suspended/resumed by the runtime instead of compiler-generated
 		     state machines. Without the state machine overhead there is no reason to prefer ValueTask, so

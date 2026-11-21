@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>
+        <!-- Unlike the other templates, this Blazor WebAssembly template does not opt into runtime async
+             (runtime-async=on). -->
     </PropertyGroup>
 
     <ItemGroup>

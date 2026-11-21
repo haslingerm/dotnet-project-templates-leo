@@ -94,7 +94,7 @@ public partial class MissionListViewModel(
         }
     }
 
-    public async Task HandleMissionEdited(MissionDisplay mission)
+    public async Task HandleMissionEditedAsync(MissionDisplay mission)
     {
         Processing = true;
         try

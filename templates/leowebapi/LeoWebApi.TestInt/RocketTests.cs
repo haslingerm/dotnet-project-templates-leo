@@ -123,4 +123,79 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
 
         allRocketsContent.Should().NotBeNull().And.BeEmpty();
     }
+
+    [Fact]
+    public async Task GetRocketById_ExistingRocket_Success()
+    {
+        var rocket = await SeedRocketAsync();
+
+        var response = await ApiClient.GetAsync($"api/rockets/{rocket.Id}", TestCancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await response.Content.ReadFromJsonAsync<RocketDto>(JsonOptions, TestCancellationToken);
+
+        content.Should().BeEquivalentTo(RocketDto.FromRocket(rocket));
+    }
+
+    [Fact]
+    public async Task GetRocketById_NotFound()
+    {
+        var response = await ApiClient.GetAsync("api/rockets/4711", TestCancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteRocket_ExistingRocket_Success()
+    {
+        var rocket = await SeedRocketAsync();
+
+        var response = await ApiClient.DeleteAsync($"api/rockets/{rocket.Id}", TestCancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        // the deletion has been committed
+        var getResponse = await ApiClient.GetAsync($"api/rockets/{rocket.Id}", TestCancellationToken);
+        getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteRocket_NotFound()
+    {
+        var rocket = await SeedRocketAsync();
+
+        var response = await ApiClient.DeleteAsync($"api/rockets/{rocket.Id + 1}", TestCancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        // other rockets are not affected
+        var allRocketsResponse = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
+        IReadOnlyList<RocketDto>? allRocketsContent =
+            await allRocketsResponse.Content.ReadFromJsonAsync<IReadOnlyList<RocketDto>>(JsonOptions,
+                 TestCancellationToken);
+
+        allRocketsContent.Should().ContainSingle()
+                         .Which.Id.Should().Be(rocket.Id);
+    }
+
+    private async Task<Rocket> SeedRocketAsync()
+    {
+        var rocket = new Rocket
+        {
+            Manufacturer = "SpaceX",
+            ModelName = "Falcon 9",
+            MaxThrust = 7_600_000,
+            PayloadDeltaV = 9_300_000
+        };
+
+        await ModifyDatabaseContentAsync(async ctx =>
+        {
+            ctx.Rockets.Add(rocket);
+
+            await ctx.SaveChangesAsync();
+        });
+
+        // the id has been assigned by the database
+        return rocket;
+    }
 }

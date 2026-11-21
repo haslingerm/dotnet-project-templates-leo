@@ -20,7 +20,7 @@ public partial class MissionList : UserControl
                 return;
             }
 
-            await viewModel.HandleMissionEdited(mission);
+            await viewModel.HandleMissionEditedAsync(mission);
         }
         catch (Exception)
         {

@@ -54,7 +54,7 @@ public sealed class MissionMgmtEndpoint(
             = await missionService.UpdateMissionAsync(request.Id, desc, request.Dangerousness);
 
         // A switch statement, because the success branch also commits. The compiler does not know that it handles
-        // every case, so it needs the default guard; that guard is no case: LA0003 still checks that all are handled.
+        // every case, so it needs a default section - only a guard, not a handled case: LA0003 still checks them all.
         switch (updateResult)
         {
             case Success:
@@ -145,6 +145,7 @@ public sealed class MissionMgmtEndpoint(
             }
             case NotFound:
             {
+                // left uncommitted on purpose
                 return new DeleteMissionResponse { Success = false };
             }
             default:
