@@ -58,14 +58,20 @@ public sealed class MissionMgmtEndpoint(
         switch (updateResult)
         {
             case Success:
+            {
                 await transaction.CommitAsync();
 
                 return new UpdateMissionResponse();
+            }
             case NotFound:
+            {
                 // left uncommitted on purpose
                 throw RpcHelper.NotFound();
+            }
             default:
+            {
                 throw new UnreachableException();
+            }
         }
     }
 
@@ -83,25 +89,35 @@ public sealed class MissionMgmtEndpoint(
         switch (assignMissionResult)
         {
             case Success:
+            {
                 await transaction.CommitAsync();
                 result = MissionAssignmentResult.Success;
 
                 break;
+            }
             // the negative outcomes are regular results here, left uncommitted on purpose
             case IMissionService.MissionNotFound:
+            {
                 result = MissionAssignmentResult.MissionNotFound;
 
                 break;
+            }
             case IMissionService.NinjaNotFound:
+            {
                 result = MissionAssignmentResult.NinjaNotFound;
 
                 break;
+            }
             case IMissionService.NinjaBusy:
+            {
                 result = MissionAssignmentResult.NinjaAlreadyOnMission;
 
                 break;
+            }
             default:
+            {
                 throw new UnreachableException();
+            }
         }
 
         return new AssignMissionResponse
@@ -122,13 +138,19 @@ public sealed class MissionMgmtEndpoint(
         switch (deleteResult)
         {
             case Success:
+            {
                 await transaction.CommitAsync();
 
                 return new DeleteMissionResponse { Success = true };
+            }
             case NotFound:
+            {
                 return new DeleteMissionResponse { Success = false };
+            }
             default:
+            {
                 throw new UnreachableException();
+            }
         }
     }
 }

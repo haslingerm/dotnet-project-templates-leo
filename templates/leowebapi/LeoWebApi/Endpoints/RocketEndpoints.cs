@@ -96,14 +96,20 @@ public static class RocketEndpoints
         switch (deleteResult)
         {
             case ServiceSuccess:
+            {
                 await transaction.CommitAsync();
 
                 return TypedResults.NoContent();
+            }
             case ServiceNotFound:
+            {
                 // left uncommitted on purpose, see AddRocketAsync
                 return TypedResults.NotFound();
+            }
             default:
+            {
                 throw new UnreachableException();
+            }
         }
     }
 }
