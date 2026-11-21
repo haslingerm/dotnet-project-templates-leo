@@ -265,7 +265,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     private async Task AssertMissionValues(long missionId, string? description, double dangerousness,
-                                                string? title = null)
+                                           string? title = null)
     {
         var missions = await GrpcClient.GetAllMissionsAsync(new GetAllRequest(),
                                                             cancellationToken: TestCancellationToken);

@@ -1,12 +1,13 @@
-﻿using Grpc.Core;
+﻿using System.Diagnostics;
+using Grpc.Core;
 using LeoGRpcApi.Api.Persistence.Model;
 using LeoGRpcApi.Api.Persistence.Util;
 using LeoGRpcApi.Api.Services;
 using LeoGRpcApi.Api.Util;
 using LeoGRpcApi.Shared.ApiContract;
 using LeoGRpcApi.Shared.ApiContract.Validation;
-using OneOf;
-using OneOf.Types;
+using LeoUnion;
+using LeoUnion.Markers;
 
 namespace LeoGRpcApi.Api.Endpoints;
 
@@ -49,17 +50,23 @@ public sealed class MissionMgmtEndpoint(
         await transaction.BeginTransactionAsync();
 
         string? desc = request.HasDescription ? request.Description : null;
-        OneOf<Success, NotFound> updateResult
+        Union<Success, NotFound> updateResult
             = await missionService.UpdateMissionAsync(request.Id, desc, request.Dangerousness);
 
-        return await updateResult.Match(async success =>
-                                        {
-                                            await transaction.CommitAsync();
+        // A switch statement, because the success branch also commits. The compiler does not know that it handles
+        // every case, so it needs the default guard; that guard is no case: LA0003 still checks that all are handled.
+        switch (updateResult)
+        {
+            case Success:
+                await transaction.CommitAsync();
 
-                                            return new UpdateMissionResponse();
-                                        },
-                                        // left uncommitted on purpose
-                                        notFound => throw RpcHelper.NotFound());
+                return new UpdateMissionResponse();
+            case NotFound:
+                // left uncommitted on purpose
+                throw RpcHelper.NotFound();
+            default:
+                throw new UnreachableException();
+        }
     }
 
     public override async Task<AssignMissionResponse> AssignMission(AssignMissionRequest request,
@@ -69,17 +76,33 @@ public sealed class MissionMgmtEndpoint(
 
         await transaction.BeginTransactionAsync();
 
-        OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
+        Union<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
             assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
-        var result = await assignMissionResult.Match<Task<MissionAssignmentResult>>(async success =>
-             {
-                 await transaction.CommitAsync();
 
-                 return MissionAssignmentResult.Success;
-             },
-             missionNotFound => Task.FromResult(MissionAssignmentResult.MissionNotFound),
-             ninjaNotFound => Task.FromResult(MissionAssignmentResult.NinjaNotFound),
-             ninjaBusy => Task.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
+        MissionAssignmentResult result;
+        switch (assignMissionResult)
+        {
+            case Success:
+                await transaction.CommitAsync();
+                result = MissionAssignmentResult.Success;
+
+                break;
+            // the negative outcomes are regular results here, left uncommitted on purpose
+            case IMissionService.MissionNotFound:
+                result = MissionAssignmentResult.MissionNotFound;
+
+                break;
+            case IMissionService.NinjaNotFound:
+                result = MissionAssignmentResult.NinjaNotFound;
+
+                break;
+            case IMissionService.NinjaBusy:
+                result = MissionAssignmentResult.NinjaAlreadyOnMission;
+
+                break;
+            default:
+                throw new UnreachableException();
+        }
 
         return new AssignMissionResponse
         {
@@ -94,19 +117,18 @@ public sealed class MissionMgmtEndpoint(
 
         await transaction.BeginTransactionAsync();
 
-        OneOf<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
+        Union<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
 
-        bool result = await deleteResult.Match<Task<bool>>(async success =>
-                                                                {
-                                                                    await transaction.CommitAsync();
-
-                                                                    return true;
-                                                                },
-                                                                notFound => Task.FromResult(false));
-
-        return new DeleteMissionResponse
+        switch (deleteResult)
         {
-            Success = result
-        };
+            case Success:
+                await transaction.CommitAsync();
+
+                return new DeleteMissionResponse { Success = true };
+            case NotFound:
+                return new DeleteMissionResponse { Success = false };
+            default:
+                throw new UnreachableException();
+        }
     }
 }

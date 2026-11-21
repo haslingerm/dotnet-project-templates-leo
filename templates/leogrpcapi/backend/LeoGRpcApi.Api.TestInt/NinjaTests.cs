@@ -104,7 +104,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     [Theory]
     [MemberData(nameof(CreateNinjaInvalidData))]
     public async Task CreateNinja_Invalid(NinjaRank rank, string codeName, IEnumerable<NinjaWeapon> weapons,
-                                               IEnumerable<string> specialSkills, string reason)
+                                          IEnumerable<string> specialSkills, string reason)
     {
         var request = new CreateNinjaRequest
         {

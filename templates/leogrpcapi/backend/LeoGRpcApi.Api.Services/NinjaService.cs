@@ -1,8 +1,8 @@
 ﻿using LeoGRpcApi.Api.Persistence.Model;
 using LeoGRpcApi.Api.Persistence.Util;
 using LeoGRpcApi.Shared.ApiContract;
-using OneOf;
-using OneOf.Types;
+using LeoUnion;
+using LeoUnion.Markers;
 
 namespace LeoGRpcApi.Api.Services;
 
@@ -20,8 +20,8 @@ public interface INinjaService
     /// <param name="specialSkills">List of special skills the ninja has</param>
     /// <returns>The newly created ninja</returns>
     public Task<Ninja> CreateNinjaAsync(NinjaRank rank, string codeName,
-                                             List<NinjaWeapon> weaponProficiencies,
-                                             List<string> specialSkills);
+                                        List<NinjaWeapon> weaponProficiencies,
+                                        List<string> specialSkills);
 
     /// <summary>
     ///     Retrieves all ninja IDs from the database
@@ -34,13 +34,13 @@ public interface INinjaService
     /// </summary>
     /// <param name="ninjaId">The unique ID of the ninja</param>
     /// <returns>The ninja, if they have been found</returns>
-    public Task<OneOf<Ninja, NotFound>> GetNinjaByIdAsync(int ninjaId);
+    public Task<Union<Ninja, NotFound>> GetNinjaByIdAsync(int ninjaId);
 }
 
 internal sealed class NinjaService(IUnitOfWork uow, ILogger<NinjaService> logger) : INinjaService
 {
     public async Task<Ninja> CreateNinjaAsync(NinjaRank rank, string codeName,
-                                                   List<NinjaWeapon> weaponProficiencies, List<string> specialSkills)
+                                              List<NinjaWeapon> weaponProficiencies, List<string> specialSkills)
     {
         var ninja = new Ninja
         {
@@ -65,7 +65,7 @@ internal sealed class NinjaService(IUnitOfWork uow, ILogger<NinjaService> logger
         return ninjaIds;
     }
 
-    public async Task<OneOf<Ninja, NotFound>> GetNinjaByIdAsync(int ninjaId)
+    public async Task<Union<Ninja, NotFound>> GetNinjaByIdAsync(int ninjaId)
     {
         var ninja = await uow.NinjaRepository.GetNinjaByIdAsync(ninjaId);
         if (ninja is null)

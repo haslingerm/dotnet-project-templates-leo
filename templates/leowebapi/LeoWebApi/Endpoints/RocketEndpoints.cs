@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FluentValidation;
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.Persistence.Util;
@@ -5,9 +6,10 @@ using LeoWebApi.Services;
 using LeoWebApi.Util;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
-using ServiceNotFound = OneOf.Types.NotFound;
-using ServiceSuccess = OneOf.Types.Success;
+using LeoUnion;
+// the service markers would clash with ASP.NET Core's typed results (TypedResults.NotFound())
+using ServiceNotFound = LeoUnion.Markers.NotFound;
+using ServiceSuccess = LeoUnion.Markers.Success;
 
 namespace LeoWebApi.Endpoints;
 
@@ -39,13 +41,14 @@ public static class RocketEndpoints
             return TypedResults.ValidationProblem(Validation.Failure(nameof(id), "Must not be negative"));
         }
 
-        OneOf<Rocket, ServiceNotFound> rocketResult = await rocketService.GetRocketByIdAsync(id, false);
+        Union<Rocket, ServiceNotFound> rocketResult = await rocketService.GetRocketByIdAsync(id, false);
 
-        return rocketResult
-            .Match<
-                Results<Ok<RocketDto>, ValidationProblem,
-                    NotFound>>(rocket => TypedResults.Ok(RocketDto.FromRocket(rocket)),
-                               notFound => TypedResults.NotFound());
+        // the compiler checks that every case of the union is handled
+        return rocketResult switch
+        {
+            Rocket rocket => TypedResults.Ok(RocketDto.FromRocket(rocket)),
+            ServiceNotFound => TypedResults.NotFound()
+        };
     }
 
     private static async Task<Ok<IEnumerable<RocketDto>>> GetAllRocketsAsync(
@@ -86,21 +89,22 @@ public static class RocketEndpoints
     {
         await transaction.BeginTransactionAsync();
 
-        OneOf<ServiceSuccess, ServiceNotFound> deleteResult = await rocketService.DeleteRocketAsync(id);
+        Union<ServiceSuccess, ServiceNotFound> deleteResult = await rocketService.DeleteRocketAsync(id);
 
-        // the branches are local functions rather than lambdas, so that Match stays readable
-        return await deleteResult.Match(OnSuccessAsync, OnNotFoundAsync);
-
-        async Task<Results<NoContent, NotFound>> OnSuccessAsync(ServiceSuccess success)
+        // A switch statement, because the success branch also commits. The compiler does not know that it handles
+        // every case, so it needs the default guard; that guard is no case: LA0003 still checks that all are handled.
+        switch (deleteResult)
         {
-            await transaction.CommitAsync();
+            case ServiceSuccess:
+                await transaction.CommitAsync();
 
-            return TypedResults.NoContent();
+                return TypedResults.NoContent();
+            case ServiceNotFound:
+                // left uncommitted on purpose, see AddRocketAsync
+                return TypedResults.NotFound();
+            default:
+                throw new UnreachableException();
         }
-
-        // left uncommitted on purpose, see AddRocketAsync
-        static Task<Results<NoContent, NotFound>> OnNotFoundAsync(ServiceNotFound notFound) =>
-            Task.FromResult<Results<NoContent, NotFound>>(TypedResults.NotFound());
     }
 }
 

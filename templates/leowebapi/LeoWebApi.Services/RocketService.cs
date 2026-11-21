@@ -1,16 +1,16 @@
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.Persistence.Util;
-using OneOf;
-using OneOf.Types;
+using LeoUnion;
+using LeoUnion.Markers;
 
 namespace LeoWebApi.Services;
 
 public interface IRocketService
 {
     public Task<Rocket> AddRocketAsync(string manufacturer, string modelName, double maxThrust, long payloadDeltaV);
-    public Task<OneOf<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking);
+    public Task<Union<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking);
     public Task<IReadOnlyCollection<Rocket>> GetAllRocketsAsync();
-    public Task<OneOf<Success, NotFound>> DeleteRocketAsync(int id);
+    public Task<Union<Success, NotFound>> DeleteRocketAsync(int id);
 }
 
 internal sealed class RocketService(IUnitOfWork uow) : IRocketService
@@ -24,7 +24,7 @@ internal sealed class RocketService(IUnitOfWork uow) : IRocketService
         return rocket;
     }
 
-    public async Task<OneOf<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking)
+    public async Task<Union<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking)
     {
         var rocket = await uow.RocketRepository.GetRocketByIdAsync(id, tracking);
 
@@ -38,7 +38,7 @@ internal sealed class RocketService(IUnitOfWork uow) : IRocketService
         return rockets;
     }
 
-    public async Task<OneOf<Success, NotFound>> DeleteRocketAsync(int id)
+    public async Task<Union<Success, NotFound>> DeleteRocketAsync(int id)
     {
         var rocket = await uow.RocketRepository.GetRocketByIdAsync(id, true);
 

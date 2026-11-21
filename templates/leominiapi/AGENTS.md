@@ -22,7 +22,7 @@ These instructions apply to this project. Preserve its small, explicit minimal-A
 - Keep JSON behavior centralized in `JsonConfig`. New DTOs must respect the existing camel-case, enum, NodaTime, required-constructor, and nullable-annotation settings.
 - Return `TypedResults` and declare all normal HTTP outcomes in `Results<...>`. Validate route/body input before doing work and return the existing RFC 9457-compatible validation/problem shapes.
 - Use `Validation.Failure` for simple parameter checks. Add a focused validator only when validation is genuinely complex; validation must remain explicit at the endpoint boundary.
-- Expected outcomes belong in typed return values, not exceptions. If a service layer with several domain outcomes is introduced, represent them with `OneOf<...>` and exhaustively `Match` them at the endpoint. Do not encode expected failure as `null`, magic values, or broad exceptions.
+- Expected outcomes belong in typed return values, not exceptions. If a service layer with several domain outcomes is introduced, represent them as unions (`Union<...>` from the `HTLLeonding.Utility.LeoUnion` package, with its `LeoUnion.Markers` such as `NotFound`, or a named `union`) and handle them exhaustively at the endpoint with switch expressions; a switch statement must list every case and may only end with `default: throw new UnreachableException();` as a guard. Do not encode expected failure as `null`, magic values, or broad exceptions.
 - Let `GlobalExceptionHandler` handle unexpected failures. Do not expose exception details to clients.
 
 ## Transactions and persistence

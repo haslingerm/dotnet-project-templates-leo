@@ -86,8 +86,8 @@ public abstract class ApiTestBase<TClient> : IClassFixture<ApiTestFixture>, IAsy
     }
 
     protected async Task AssertExceptionStatusAsync<TResponse>(Func<Task<TResponse>> action,
-                                                                    StatusCode expectedStatusCode,
-                                                                    string? exceptionReason = null)
+                                                               StatusCode expectedStatusCode,
+                                                               string? exceptionReason = null)
     {
         ExceptionAssertions<RpcException>? exceptionAssertion
             = await action.Should().ThrowAsync<RpcException>(exceptionReason ?? string.Empty);
