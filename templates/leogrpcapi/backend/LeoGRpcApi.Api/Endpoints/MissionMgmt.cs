@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Grpc.Core;
+﻿using Grpc.Core;
 using LeoGRpcApi.Api.Persistence.Model;
 using LeoGRpcApi.Api.Persistence.Util;
 using LeoGRpcApi.Api.Services;
@@ -53,26 +52,11 @@ public sealed class MissionMgmtEndpoint(
         Union<Success, NotFound> updateResult
             = await missionService.UpdateMissionAsync(request.Id, desc, request.Dangerousness);
 
-        // A switch statement, because the success branch also commits. The compiler does not know that it handles
-        // every case, so it needs a default section - only a guard, not a handled case: LA0003 still checks them all.
-        switch (updateResult)
+        return updateResult switch
         {
-            case Success:
-            {
-                await transaction.CommitAsync();
-
-                return new UpdateMissionResponse();
-            }
-            case NotFound:
-            {
-                // left uncommitted on purpose
-                throw RpcHelper.NotFound();
-            }
-            default:
-            {
-                throw new UnreachableException();
-            }
-        }
+            Success => await transaction.CommitAndReturnAsync(new UpdateMissionResponse()),
+            NotFound => throw RpcHelper.NotFound()
+        };
     }
 
     public override async Task<AssignMissionResponse> AssignMission(AssignMissionRequest request,
@@ -85,44 +69,24 @@ public sealed class MissionMgmtEndpoint(
         Union<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
             assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
 
-        MissionAssignmentResult result;
-        switch (assignMissionResult)
+        return assignMissionResult switch
         {
-            case Success:
+            Success => await transaction.CommitAndReturnAsync(new AssignMissionResponse
             {
-                await transaction.CommitAsync();
-                result = MissionAssignmentResult.Success;
-
-                break;
-            }
-            // the negative outcomes are regular results here, left uncommitted on purpose
-            case IMissionService.MissionNotFound:
+                Result = MissionAssignmentResult.Success
+            }),
+            IMissionService.MissionNotFound => new AssignMissionResponse
             {
-                result = MissionAssignmentResult.MissionNotFound;
-
-                break;
-            }
-            case IMissionService.NinjaNotFound:
+                Result = MissionAssignmentResult.MissionNotFound
+            },
+            IMissionService.NinjaNotFound => new AssignMissionResponse
             {
-                result = MissionAssignmentResult.NinjaNotFound;
-
-                break;
-            }
-            case IMissionService.NinjaBusy:
+                Result = MissionAssignmentResult.NinjaNotFound
+            },
+            IMissionService.NinjaBusy => new AssignMissionResponse
             {
-                result = MissionAssignmentResult.NinjaAlreadyOnMission;
-
-                break;
+                Result = MissionAssignmentResult.NinjaAlreadyOnMission
             }
-            default:
-            {
-                throw new UnreachableException();
-            }
-        }
-
-        return new AssignMissionResponse
-        {
-            Result = result
         };
     }
 
@@ -135,23 +99,10 @@ public sealed class MissionMgmtEndpoint(
 
         Union<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
 
-        switch (deleteResult)
+        return deleteResult switch
         {
-            case Success:
-            {
-                await transaction.CommitAsync();
-
-                return new DeleteMissionResponse { Success = true };
-            }
-            case NotFound:
-            {
-                // left uncommitted on purpose
-                return new DeleteMissionResponse { Success = false };
-            }
-            default:
-            {
-                throw new UnreachableException();
-            }
-        }
+            Success => await transaction.CommitAndReturnAsync(new DeleteMissionResponse { Success = true }),
+            NotFound => new DeleteMissionResponse { Success = false }
+        };
     }
 }

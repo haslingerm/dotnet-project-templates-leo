@@ -154,7 +154,6 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
 
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        // the deletion has been committed
         var getResponse = await ApiClient.GetAsync($"api/rockets/{rocket.Id}", TestCancellationToken);
         getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -168,7 +167,6 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
-        // other rockets are not affected
         var allRocketsResponse = await ApiClient.GetAsync("api/rockets", TestCancellationToken);
         IReadOnlyList<RocketDto>? allRocketsContent =
             await allRocketsResponse.Content.ReadFromJsonAsync<IReadOnlyList<RocketDto>>(JsonOptions,
@@ -195,7 +193,6 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
             await ctx.SaveChangesAsync();
         });
 
-        // the id has been assigned by the database
         return rocket;
     }
 }

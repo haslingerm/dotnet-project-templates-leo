@@ -6,8 +6,6 @@ Used to create projects for assignments [@HTL Leonding](https://www.htl-leonding
 
 >  `dotnet new install HTLLeonding.Utility.Templates`
 
-Version 2.x of the templates targets .NET 11 (C# 15) and requires the .NET 11 SDK.
-
 ### Updates
 
 Running the install command above again will update the templates package to the latest version.

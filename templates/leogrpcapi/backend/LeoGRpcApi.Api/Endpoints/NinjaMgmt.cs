@@ -57,7 +57,6 @@ public sealed class NinjaMgmtEndpoint(
 
         Union<Ninja, NotFound> ninjaResult = await ninjaService.GetNinjaByIdAsync(request.Id);
 
-        // the compiler checks that every case of the union is handled
         return ninjaResult switch
         {
             Ninja ninja => ninja.ToDto(),
