@@ -13,11 +13,11 @@ jobs:
     env:
       APP_DIR: 'LeoWebApi'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
       - name: restore dependencies
         run: dotnet restore
       - name: build
@@ -35,7 +35,7 @@ jobs:
         run: mkdir -p Artifacts
       - name: copy binaries to artifact directories
         run: cp -r LeoWebApi/release/LeoWebApi.zip Artifacts/LeoWebApi.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: LeoWebApi
           path: Artifacts

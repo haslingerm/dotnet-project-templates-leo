@@ -1,13 +1,13 @@
 using FluentValidation;
+using LeoUnion;
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.Persistence.Util;
 using LeoWebApi.Services;
 using LeoWebApi.Util;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
-using ServiceNotFound = OneOf.Types.NotFound;
-using ServiceSuccess = OneOf.Types.Success;
+using ServiceNotFound = LeoUnion.Markers.NotFound;
+using ServiceSuccess = LeoUnion.Markers.Success;
 
 namespace LeoWebApi.Endpoints;
 
@@ -31,7 +31,7 @@ public static class RocketEndpoints
         }
     }
 
-    private static async ValueTask<Results<Ok<RocketDto>, ValidationProblem, NotFound>>
+    private static async Task<Results<Ok<RocketDto>, ValidationProblem, NotFound>>
         GetRocketByIdAsync([FromRoute] int id, [FromServices] IRocketService rocketService)
     {
         if (id < 0)
@@ -39,16 +39,16 @@ public static class RocketEndpoints
             return TypedResults.ValidationProblem(Validation.Failure(nameof(id), "Must not be negative"));
         }
 
-        OneOf<Rocket, ServiceNotFound> rocketResult = await rocketService.GetRocketByIdAsync(id, false);
+        Union<Rocket, ServiceNotFound> rocketResult = await rocketService.GetRocketByIdAsync(id, false);
 
-        return rocketResult
-            .Match<
-                Results<Ok<RocketDto>, ValidationProblem,
-                    NotFound>>(rocket => TypedResults.Ok(RocketDto.FromRocket(rocket)),
-                               notFound => TypedResults.NotFound());
+        return rocketResult switch
+        {
+            Rocket rocket => TypedResults.Ok(RocketDto.FromRocket(rocket)),
+            ServiceNotFound => TypedResults.NotFound()
+        };
     }
 
-    private static async ValueTask<Ok<IEnumerable<RocketDto>>> GetAllRocketsAsync(
+    private static async Task<Ok<IEnumerable<RocketDto>>> GetAllRocketsAsync(
         [FromServices] IRocketService rocketService)
     {
         IReadOnlyCollection<Rocket> rockets = await rocketService.GetAllRocketsAsync();
@@ -56,7 +56,7 @@ public static class RocketEndpoints
         return TypedResults.Ok(rockets.Select(RocketDto.FromRocket));
     }
 
-    private static async ValueTask<Results<CreatedAtRoute<RocketDto>, ValidationProblem>>
+    private static async Task<Results<CreatedAtRoute<RocketDto>, ValidationProblem>>
         AddRocketAsync([FromBody] AddRocketRequest addRequest,
                        [FromServices] IRocketService rocketService,
                        [FromServices] ITransactionProvider transaction)
@@ -80,27 +80,19 @@ public static class RocketEndpoints
         });
     }
 
-    private static async ValueTask<Results<NoContent, NotFound>> DeleteRocketAsync(
+    private static async Task<Results<NoContent, NotFound>> DeleteRocketAsync(
         [FromRoute] int id, [FromServices] IRocketService rocketService,
         [FromServices] ITransactionProvider transaction)
     {
         await transaction.BeginTransactionAsync();
 
-        OneOf<ServiceSuccess, ServiceNotFound> deleteResult = await rocketService.DeleteRocketAsync(id);
+        Union<ServiceSuccess, ServiceNotFound> deleteResult = await rocketService.DeleteRocketAsync(id);
 
-        // the branches are local functions rather than lambdas, so that Match stays readable
-        return await deleteResult.Match(OnSuccessAsync, OnNotFoundAsync);
-
-        async ValueTask<Results<NoContent, NotFound>> OnSuccessAsync(ServiceSuccess success)
+        return deleteResult switch
         {
-            await transaction.CommitAsync();
-
-            return TypedResults.NoContent();
-        }
-
-        // left uncommitted on purpose, see AddRocketAsync
-        static ValueTask<Results<NoContent, NotFound>> OnNotFoundAsync(ServiceNotFound notFound) =>
-            ValueTask.FromResult<Results<NoContent, NotFound>>(TypedResults.NotFound());
+            ServiceSuccess => await transaction.CommitAndReturnAsync(TypedResults.NoContent()),
+            ServiceNotFound => TypedResults.NotFound()
+        };
     }
 }
 

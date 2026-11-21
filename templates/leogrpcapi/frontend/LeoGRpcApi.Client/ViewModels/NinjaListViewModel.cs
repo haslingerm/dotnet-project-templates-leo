@@ -64,7 +64,7 @@ public partial class NinjaListViewModel(
 
         return;
 
-        async ValueTask LoadNinjaAsync(int id)
+        async Task LoadNinjaAsync(int id)
         {
             try
             {
@@ -79,7 +79,7 @@ public partial class NinjaListViewModel(
         }
     }
 
-    public async ValueTask HandleNinjaSelectedAsync()
+    public async Task HandleNinjaSelectedAsync()
     {
         if (!PickMode)
         {

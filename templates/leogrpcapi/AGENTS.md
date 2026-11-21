@@ -21,11 +21,11 @@ These instructions apply to this project. Preserve its contract-first gRPC desig
 - Put reusable request validators in `Shared.ApiContract/Validation` and invoke them explicitly in both server endpoints and client service wrappers where applicable.
 - Map invalid input to `InvalidArgument` and transport-level absence to `NotFound` via `RpcHelper`. When a negative result is normal application data, model it explicitly in the response (an enum or `oneof`) rather than throwing. Let `ExceptionInterceptor` sanitize and log unexpected failures.
 
-## Backend flow, OneOf, and transactions
+## Backend flow, unions, and transactions
 
 - Add one generated service implementation per resource under `Api/Endpoints` and map it explicitly in `Setup.MapApplicationEndpoints`.
 - Endpoints own validation, transaction boundaries, DTO mapping, and translation to gRPC statuses/responses. Services own business rules and must not depend on `Grpc.Core`.
-- Services represent expected alternatives with C# `OneOf<...>` and small named result types such as `MissionNotFound` or `NinjaBusy`. Do not replace these with `null`, booleans, magic values, or exceptions. Endpoints must exhaustively handle them with `Match`.
+- Services represent expected alternatives as unions: `Union<...>` from `HTLLeonding.Utility.LeoUnion`, with the markers from `LeoUnion.Markers` (`Success`, `NotFound`, `Conflict`, `Error`) and small named result types (`readonly record struct`) such as `MissionNotFound` or `NinjaBusy`. Declare a named `union` instead when several operations return the same set of domain-specific outcomes; generic marker combinations such as `Union<Success, NotFound>` stay inline. Do not replace these with `null`, booleans, magic values, or exceptions. Endpoints must translate every outcome: Handle them exhaustively with a switch expression; where a branch must do more (e.g. commit), use a switch statement that lists every case and ends with a `default` section containing only `throw new UnreachableException();` - only a guard: analyzer rule LA0003 still checks that every case is handled. Never cover remaining cases with a discard (`_ =>`) or any other `default`.
 - Every mutating RPC validates first, calls `BeginTransactionAsync` immediately before its write workflow, and calls `CommitAsync` only in the successful result branch.
 - The endpoint owns the transaction. Services and repositories must never begin, commit, or hide one. An exception or unsuccessful result stays uncommitted so scoped `UnitOfWork` disposal rolls it back. Use explicit rollback only if work must continue in the same scope.
 - Services coordinate repositories and call `IUnitOfWork.SaveChangesAsync`; repositories do not save and do not return protobuf DTOs.
@@ -41,14 +41,14 @@ These instructions apply to this project. Preserve its contract-first gRPC desig
 ## C# conventions
 
 - Preserve nullable reference types, latest analyzers, warnings-as-errors, and Leo analyzers. Fix warnings instead of suppressing them.
-- Always use Allman braces: every block-opening brace is on its own line, including methods, properties, control flow, block lambdas, and local functions.
+- Always use Allman braces: every block-opening brace is on its own line, including methods, properties, control flow, block lambdas, and local functions. Every `case`/`default` section of a switch statement gets its own block: the label, then `{` on the next line.
 - Use file-scoped namespaces, four-space indentation, primary constructors where clear, and sealed types when inheritance is not intended.
 - Do not use the null-forgiving operator (`!`) outside EF entity navigation properties where framework materialization makes it strictly unavoidable. Prefer `required`, accurate nullable types, guards, pattern matching, generated presence APIs, or explicit exceptions. Never use `!` merely to silence analysis.
-- Use NodaTime and injected `IClock` for domain time, structured logging, and async APIs without blocking. Add `Async` suffixes except when overriding generated gRPC method names.
+- Use NodaTime and injected `IClock` for domain time, structured logging, and async APIs without blocking. Add `Async` suffixes except when overriding generated gRPC method names. Return `Task`/`Task<T>` (runtime async is enabled); use `ValueTask` only where an external contract requires it, such as `IAsyncDisposable`, xUnit's `IAsyncLifetime`, or `IExceptionHandler`.
 
 ## Tests and coverage
 
-- Every behavior change needs tests for the successful path and relevant invalid, not-found/conflict, alternate `OneOf`, transaction, mapping, and compatibility paths. Coverage must assert behavior, not merely execute lines.
+- Every behavior change needs tests for the successful path and relevant invalid, not-found/conflict, alternate union outcome, transaction, mapping, and compatibility paths. Coverage must assert behavior, not merely execute lines.
 - Backend unit tests belong in `LeoGRpcApi.Api.Test`. Isolate service/business logic with NSubstitute; do not start the host or access a database, network, or filesystem. Add a separate frontend unit-test project if substantial Client.Core or view-model logic needs testing; do not mix it into backend tests.
 - Backend integration tests belong in `LeoGRpcApi.Api.TestInt`. Use the generated gRPC client against the in-process host and PostgreSQL via Testcontainers; verify protobuf presence, status codes, responses, persistence, and commit/rollback behavior.
 - Derive integration tests from `ApiTestBase<TClient>`, seed through `ImportSeedDataAsync`/`ModifyDatabaseContentAsync`, and rely on the fixture's per-test schema reset. Tests must be deterministic and order-independent.

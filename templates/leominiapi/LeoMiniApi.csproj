@@ -1,15 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Runtime async: async methods are suspended/resumed by the runtime instead of compiler-generated
+         state machines. Without the state machine overhead there is no reason to prefer ValueTask, so
+         we use Task unless an external API (e.g. IAsyncDisposable) requires ValueTask. -->
+    <Features>$(Features);runtime-async=on</Features>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HTLLeonding.Utility.LeoAnalyzers" Version="1.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+    <PackageReference Include="HTLLeonding.Utility.LeoAnalyzers" Version="1.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.4.0" />
   </ItemGroup>
 

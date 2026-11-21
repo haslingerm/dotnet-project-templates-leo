@@ -22,7 +22,7 @@ public class ViewLocator : IDataTemplate
         string name = typeName.Replace("ViewModel", "View", StringComparison.Ordinal);
         var type = Type.GetType(name);
 
-        if (type != null)
+        if (type is not null)
         {
             return (Control) Activator.CreateInstance(type)!;
         }

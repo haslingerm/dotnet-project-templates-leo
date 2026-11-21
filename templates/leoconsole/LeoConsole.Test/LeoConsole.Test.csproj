@@ -1,9 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net11.0</TargetFramework>
         <OutputType>exe</OutputType>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- Runtime async: async methods are suspended/resumed by the runtime instead of compiler-generated
+		     state machines. Without the state machine overhead there is no reason to prefer ValueTask, so
+		     we use Task unless an external API (e.g. IAsyncDisposable) requires ValueTask. -->
+		<Features>$(Features);runtime-async=on</Features>
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<IsPackable>false</IsPackable>
@@ -18,8 +23,8 @@
 	<ItemGroup>
 		<PackageReference Include="AwesomeAssertions" Version="9.6.0" />
 		<PackageReference Include="NSubstitute" Version="6.2.0" />
-		<PackageReference Include="xunit.v3" Version="4.0.0" />
-		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.10.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.3" />
+		<PackageReference Include="coverlet.MTP" Version="10.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

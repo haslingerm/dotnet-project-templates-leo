@@ -13,7 +13,7 @@ public interface IMissionService
     ///     Retrieves all missions
     /// </summary>
     /// <returns>A collection of mission DTOs</returns>
-    public ValueTask<IReadOnlyCollection<MissionDto>> GetAllMissionsAsync();
+    public Task<IReadOnlyCollection<MissionDto>> GetAllMissionsAsync();
 
     /// <summary>
     ///     Updates a mission with the given ID.
@@ -22,14 +22,14 @@ public interface IMissionService
     /// <param name="missionId">The ID of the mission to update</param>
     /// <param name="dangerousness">The new dangerousness of the mission</param>
     /// <param name="description">The new description of the mission - optional</param>
-    public ValueTask UpdateMissionAsync(long missionId, double dangerousness, string? description);
+    public Task UpdateMissionAsync(long missionId, double dangerousness, string? description);
 
     /// <summary>
     ///     Deletes a mission with the given ID
     /// </summary>
     /// <param name="missionId">ID of the mission to delete</param>
     /// <returns>A flag indicating if the delete operation was successful or not</returns>
-    public ValueTask<bool> DeleteMissionAsync(long missionId);
+    public Task<bool> DeleteMissionAsync(long missionId);
 
     /// <summary>
     ///     Assigns a ninja to a mission.
@@ -38,13 +38,13 @@ public interface IMissionService
     /// <param name="missionId">The ID of the mission to which to assign the ninja to</param>
     /// <param name="ninjaId">The ID of the ninja to assign</param>
     /// <returns>A detailed operation result</returns>
-    public ValueTask<MissionAssignmentResult> AssignNinjaToMissionAsync(long missionId, int ninjaId);
+    public Task<MissionAssignmentResult> AssignNinjaToMissionAsync(long missionId, int ninjaId);
 }
 
 internal sealed class MissionService(GrpcClientFactory clientFactory)
     : ServiceBase<MissionMgmt.MissionMgmtClient>(clientFactory), IMissionService
 {
-    public async ValueTask<IReadOnlyCollection<MissionDto>> GetAllMissionsAsync()
+    public async Task<IReadOnlyCollection<MissionDto>> GetAllMissionsAsync()
     {
         var request = new GetAllRequest();
         var response = await ApiClient.GetAllMissionsAsync(request);
@@ -52,7 +52,7 @@ internal sealed class MissionService(GrpcClientFactory clientFactory)
         return response.Missions.ToList();
     }
 
-    public async ValueTask UpdateMissionAsync(long missionId, double dangerousness, string? description)
+    public async Task UpdateMissionAsync(long missionId, double dangerousness, string? description)
     {
         var request = new UpdateMissionRequest
         {
@@ -65,7 +65,7 @@ internal sealed class MissionService(GrpcClientFactory clientFactory)
         await ApiClient.UpdateMissionAsync(request);
     }
 
-    public async ValueTask<bool> DeleteMissionAsync(long missionId)
+    public async Task<bool> DeleteMissionAsync(long missionId)
     {
         var request = new DeleteMissionRequest { Id = missionId };
         ThrowIfInvalid<DeleteMissionRequest, DeleteMissionRequestValidator>(request);
@@ -75,7 +75,7 @@ internal sealed class MissionService(GrpcClientFactory clientFactory)
         return result.Success;
     }
 
-    public async ValueTask<MissionAssignmentResult> AssignNinjaToMissionAsync(long missionId, int ninjaId)
+    public async Task<MissionAssignmentResult> AssignNinjaToMissionAsync(long missionId, int ninjaId)
     {
         var request = new AssignMissionRequest
         {

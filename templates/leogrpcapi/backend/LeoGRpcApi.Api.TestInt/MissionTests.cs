@@ -12,7 +12,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     private NinjaMgmt.NinjaMgmtClient NinjaGrpcClient => CreateGrpcClient<NinjaMgmt.NinjaMgmtClient>();
 
     [Fact]
-    public async ValueTask GetAllMissions_Success()
+    public async Task GetAllMissions_Success()
     {
         var response = await GrpcClient.GetAllMissionsAsync(new GetAllRequest(),
                                                             cancellationToken: TestCancellationToken);
@@ -33,7 +33,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask CreateMission_Success()
+    public async Task CreateMission_Success()
     {
         const string Title = "Test Mission";
         const string Description = "This is a test mission";
@@ -61,7 +61,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     [InlineData("", 0.55D, "Title cannot be empty")]
     [InlineData("Valid Title", -0.1D, "Dangerousness cannot be lower than 0")]
     [InlineData("Valid Title", 1.1D, "Dangerousness cannot be higher than 1")]
-    public async ValueTask CreateMission_Invalid(string title, double dangerousness, string reason)
+    public async Task CreateMission_Invalid(string title, double dangerousness, string reason)
     {
         var request = new CreateMissionRequest
         {
@@ -77,7 +77,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask UpdateMission_Success()
+    public async Task UpdateMission_Success()
     {
         const long MissionId = 1L;
         const string NewDesc = "Updated Mission Description";
@@ -102,7 +102,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     [InlineData(0L, 0.5D, "Mission ID must be greater than 0")]
     [InlineData(1L, -0.5D, "Dangerousness must be >= 0")]
     [InlineData(1L, 1.5D, "Dangerousness must be <= 1")]
-    public async ValueTask UpdateMission_Invalid(long id, double dangerousness, string reason)
+    public async Task UpdateMission_Invalid(long id, double dangerousness, string reason)
     {
         var request = new UpdateMissionRequest
         {
@@ -118,7 +118,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask UpdateMission_NotFound()
+    public async Task UpdateMission_NotFound()
     {
         var request = new UpdateMissionRequest
         {
@@ -134,7 +134,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask AssignMission_Success()
+    public async Task AssignMission_Success()
     {
         const long MissionId = 2L;
         const int NinjaId = 3;
@@ -161,7 +161,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     [InlineData(0L, 3, "Mission ID must be > 0")]
     [InlineData(2L, -1, "Ninja ID must be positive")]
     [InlineData(2L, 0, "Ninja ID must be greater than 0")]
-    public async ValueTask AssignMission_Invalid(long missionId, int ninjaId, string reason)
+    public async Task AssignMission_Invalid(long missionId, int ninjaId, string reason)
     {
         var request = new AssignMissionRequest
         {
@@ -178,7 +178,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     [Theory]
     [InlineData(999L, 3, MissionAssignmentResult.MissionNotFound)]
     [InlineData(2L, 999, MissionAssignmentResult.NinjaNotFound)]
-    public async ValueTask AssignMission_NotFound(long missionId, int ninjaId, MissionAssignmentResult expectedResult)
+    public async Task AssignMission_NotFound(long missionId, int ninjaId, MissionAssignmentResult expectedResult)
     {
         var request = new AssignMissionRequest
         {
@@ -192,7 +192,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask AssignMission_NinjaBusy()
+    public async Task AssignMission_NinjaBusy()
     {
         const long MissionId = 2L;
         const int NinjaId = 1;
@@ -209,7 +209,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask DeleteMission_Success()
+    public async Task DeleteMission_Success()
     {
         const long MissionId = 1L;
 
@@ -229,7 +229,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask DeleteMission_NotFound()
+    public async Task DeleteMission_NotFound()
     {
         var request = new DeleteMissionRequest { Id = 999L };
 
@@ -239,7 +239,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask DeleteMission_Invalid()
+    public async Task DeleteMission_Invalid()
     {
         var request = new DeleteMissionRequest { Id = -1L };
 
@@ -249,7 +249,7 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
                                          StatusCode.InvalidArgument, "Mission ID must be > 0");
     }
 
-    protected override async ValueTask ImportSeedDataAsync(DatabaseContext context)
+    protected override async Task ImportSeedDataAsync(DatabaseContext context)
     {
         await base.ImportSeedDataAsync(context);
 
@@ -264,8 +264,8 @@ public sealed class MissionTests(ApiTestFixture apiFixture)
         await context.SaveChangesAsync();
     }
 
-    private async ValueTask AssertMissionValues(long missionId, string? description, double dangerousness,
-                                                string? title = null)
+    private async Task AssertMissionValues(long missionId, string? description, double dangerousness,
+                                           string? title = null)
     {
         var missions = await GrpcClient.GetAllMissionsAsync(new GetAllRequest(),
                                                             cancellationToken: TestCancellationToken);

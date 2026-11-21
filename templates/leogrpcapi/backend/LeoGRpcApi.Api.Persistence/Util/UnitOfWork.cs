@@ -8,9 +8,27 @@ namespace LeoGRpcApi.Api.Persistence.Util;
 
 public interface ITransactionProvider : IAsyncDisposable, IDisposable
 {
-    public ValueTask BeginTransactionAsync();
-    public ValueTask CommitAsync();
-    public ValueTask RollbackAsync();
+    public Task BeginTransactionAsync();
+    public Task CommitAsync();
+    public Task RollbackAsync();
+}
+
+public static class TransactionProviderExtensions
+{
+    // an extension instead of an interface member, so a mocked ITransactionProvider still passes the result through
+    extension(ITransactionProvider transaction)
+    {
+        /// <summary>
+        ///     Commits the current transaction and then returns <paramref name="result" />, so committing fits
+        ///     into a single switch expression arm
+        /// </summary>
+        public async Task<T> CommitAndReturnAsync<T>(T result)
+        {
+            await transaction.CommitAsync();
+
+            return result;
+        }
+    }
 }
 
 public interface IUnitOfWork
@@ -29,7 +47,7 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
     public INinjaRepository NinjaRepository => new NinjaRepository(context.Ninjas);
     public IMissionRepository MissionRepository => new MissionRepository(context.Missions);
 
-    public async ValueTask BeginTransactionAsync()
+    public async Task BeginTransactionAsync()
     {
         if (_transaction is not null)
         {
@@ -39,7 +57,7 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
         _transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Snapshot);
     }
 
-    public async ValueTask CommitAsync()
+    public async Task CommitAsync()
     {
         if (_transaction is null)
         {
@@ -50,7 +68,7 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
         _transaction = null;
     }
 
-    public async ValueTask RollbackAsync()
+    public async Task RollbackAsync()
     {
         if (_transaction is null)
         {

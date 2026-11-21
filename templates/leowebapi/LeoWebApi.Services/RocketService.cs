@@ -1,21 +1,21 @@
 using LeoWebApi.Persistence.Model;
 using LeoWebApi.Persistence.Util;
-using OneOf;
-using OneOf.Types;
+using LeoUnion;
+using LeoUnion.Markers;
 
 namespace LeoWebApi.Services;
 
 public interface IRocketService
 {
-    public ValueTask<Rocket> AddRocketAsync(string manufacturer, string modelName, double maxThrust, long payloadDeltaV);
-    public ValueTask<OneOf<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking);
-    public ValueTask<IReadOnlyCollection<Rocket>> GetAllRocketsAsync();
-    public ValueTask<OneOf<Success, NotFound>> DeleteRocketAsync(int id);
+    public Task<Rocket> AddRocketAsync(string manufacturer, string modelName, double maxThrust, long payloadDeltaV);
+    public Task<Union<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking);
+    public Task<IReadOnlyCollection<Rocket>> GetAllRocketsAsync();
+    public Task<Union<Success, NotFound>> DeleteRocketAsync(int id);
 }
 
 internal sealed class RocketService(IUnitOfWork uow) : IRocketService
 {
-    public async ValueTask<Rocket> AddRocketAsync(string manufacturer, string modelName, double maxThrust, long payloadDeltaV)
+    public async Task<Rocket> AddRocketAsync(string manufacturer, string modelName, double maxThrust, long payloadDeltaV)
     {
         var rocket = uow.RocketRepository.AddRocket(modelName, manufacturer, maxThrust, payloadDeltaV);
 
@@ -24,21 +24,21 @@ internal sealed class RocketService(IUnitOfWork uow) : IRocketService
         return rocket;
     }
 
-    public async ValueTask<OneOf<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking)
+    public async Task<Union<Rocket, NotFound>> GetRocketByIdAsync(int id, bool tracking)
     {
         var rocket = await uow.RocketRepository.GetRocketByIdAsync(id, tracking);
 
         return rocket is null ? new NotFound() : rocket;
     }
 
-    public async ValueTask<IReadOnlyCollection<Rocket>> GetAllRocketsAsync()
+    public async Task<IReadOnlyCollection<Rocket>> GetAllRocketsAsync()
     {
         IReadOnlyCollection<Rocket> rockets = await uow.RocketRepository.GetAllRocketsAsync(false);
 
         return rockets;
     }
 
-    public async ValueTask<OneOf<Success, NotFound>> DeleteRocketAsync(int id)
+    public async Task<Union<Success, NotFound>> DeleteRocketAsync(int id)
     {
         var rocket = await uow.RocketRepository.GetRocketByIdAsync(id, true);
 

@@ -59,7 +59,7 @@ public sealed class ApiTestFixture : IAsyncLifetime
         await _postgresContainer.DisposeAsync();
     }
 
-    public async ValueTask RestoreDatabaseAsync(Func<DatabaseContext, ValueTask> seedDataImporter)
+    public async Task RestoreDatabaseAsync(Func<DatabaseContext, Task> seedDataImporter)
     {
         await using var contextScope = CreateContextScope();
 
@@ -73,7 +73,7 @@ public sealed class ApiTestFixture : IAsyncLifetime
         await seedDataImporter(contextScope.Context);
     }
 
-    public async ValueTask ModifyDatabaseContentAsync(Func<DatabaseContext, ValueTask> modifier)
+    public async Task ModifyDatabaseContentAsync(Func<DatabaseContext, Task> modifier)
     {
         await using var contextScope = CreateContextScope();
 

@@ -5,8 +5,8 @@ using LeoGRpcApi.Api.Services;
 using LeoGRpcApi.Api.Util;
 using LeoGRpcApi.Shared.ApiContract;
 using LeoGRpcApi.Shared.ApiContract.Validation;
-using OneOf;
-using OneOf.Types;
+using LeoUnion;
+using LeoUnion.Markers;
 
 namespace LeoGRpcApi.Api.Endpoints;
 
@@ -49,17 +49,14 @@ public sealed class MissionMgmtEndpoint(
         await transaction.BeginTransactionAsync();
 
         string? desc = request.HasDescription ? request.Description : null;
-        OneOf<Success, NotFound> updateResult
+        Union<Success, NotFound> updateResult
             = await missionService.UpdateMissionAsync(request.Id, desc, request.Dangerousness);
 
-        return await updateResult.Match(async success =>
-                                        {
-                                            await transaction.CommitAsync();
-
-                                            return new UpdateMissionResponse();
-                                        },
-                                        // left uncommitted on purpose
-                                        notFound => throw RpcHelper.NotFound());
+        return updateResult switch
+        {
+            Success => await transaction.CommitAndReturnAsync(new UpdateMissionResponse()),
+            NotFound => throw RpcHelper.NotFound()
+        };
     }
 
     public override async Task<AssignMissionResponse> AssignMission(AssignMissionRequest request,
@@ -69,21 +66,27 @@ public sealed class MissionMgmtEndpoint(
 
         await transaction.BeginTransactionAsync();
 
-        OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
+        Union<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
             assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
-        var result = await assignMissionResult.Match<ValueTask<MissionAssignmentResult>>(async success =>
-             {
-                 await transaction.CommitAsync();
 
-                 return MissionAssignmentResult.Success;
-             },
-             missionNotFound => ValueTask.FromResult(MissionAssignmentResult.MissionNotFound),
-             ninjaNotFound => ValueTask.FromResult(MissionAssignmentResult.NinjaNotFound),
-             ninjaBusy => ValueTask.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
-
-        return new AssignMissionResponse
+        return assignMissionResult switch
         {
-            Result = result
+            Success => await transaction.CommitAndReturnAsync(new AssignMissionResponse
+            {
+                Result = MissionAssignmentResult.Success
+            }),
+            IMissionService.MissionNotFound => new AssignMissionResponse
+            {
+                Result = MissionAssignmentResult.MissionNotFound
+            },
+            IMissionService.NinjaNotFound => new AssignMissionResponse
+            {
+                Result = MissionAssignmentResult.NinjaNotFound
+            },
+            IMissionService.NinjaBusy => new AssignMissionResponse
+            {
+                Result = MissionAssignmentResult.NinjaAlreadyOnMission
+            }
         };
     }
 
@@ -94,19 +97,12 @@ public sealed class MissionMgmtEndpoint(
 
         await transaction.BeginTransactionAsync();
 
-        OneOf<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
+        Union<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
 
-        bool result = await deleteResult.Match<ValueTask<bool>>(async success =>
-                                                                {
-                                                                    await transaction.CommitAsync();
-
-                                                                    return true;
-                                                                },
-                                                                notFound => ValueTask.FromResult(false));
-
-        return new DeleteMissionResponse
+        return deleteResult switch
         {
-            Success = result
+            Success => await transaction.CommitAndReturnAsync(new DeleteMissionResponse { Success = true }),
+            NotFound => new DeleteMissionResponse { Success = false }
         };
     }
 }

@@ -5,8 +5,8 @@ using LeoGRpcApi.Api.Services;
 using LeoGRpcApi.Api.Util;
 using LeoGRpcApi.Shared.ApiContract;
 using LeoGRpcApi.Shared.ApiContract.Validation;
-using OneOf;
-using OneOf.Types;
+using LeoUnion;
+using LeoUnion.Markers;
 
 namespace LeoGRpcApi.Api.Endpoints;
 
@@ -55,9 +55,12 @@ public sealed class NinjaMgmtEndpoint(
     {
         RpcHelper.ThrowIfInvalid<GetNinjaByIdRequest, GetNinjaByIdRequestValidator>(request);
 
-        OneOf<Ninja, NotFound> ninjaResult = await ninjaService.GetNinjaByIdAsync(request.Id);
+        Union<Ninja, NotFound> ninjaResult = await ninjaService.GetNinjaByIdAsync(request.Id);
 
-        return ninjaResult.Match(ninja => ninja.ToDto(),
-                                 notFound => throw RpcHelper.NotFound());
+        return ninjaResult switch
+        {
+            Ninja ninja => ninja.ToDto(),
+            NotFound => throw RpcHelper.NotFound()
+        };
     }
 }
