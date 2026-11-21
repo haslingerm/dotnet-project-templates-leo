@@ -44,7 +44,7 @@ These instructions apply to this project. Preserve its contract-first gRPC desig
 - Always use Allman braces: every block-opening brace is on its own line, including methods, properties, control flow, block lambdas, and local functions.
 - Use file-scoped namespaces, four-space indentation, primary constructors where clear, and sealed types when inheritance is not intended.
 - Do not use the null-forgiving operator (`!`) outside EF entity navigation properties where framework materialization makes it strictly unavoidable. Prefer `required`, accurate nullable types, guards, pattern matching, generated presence APIs, or explicit exceptions. Never use `!` merely to silence analysis.
-- Use NodaTime and injected `IClock` for domain time, structured logging, and async APIs without blocking. Add `Async` suffixes except when overriding generated gRPC method names.
+- Use NodaTime and injected `IClock` for domain time, structured logging, and async APIs without blocking. Add `Async` suffixes except when overriding generated gRPC method names. Return `Task`/`Task<T>` (runtime async is enabled); use `ValueTask` only where an external contract requires it, such as `IAsyncDisposable`, xUnit's `IAsyncLifetime`, or `IExceptionHandler`.
 
 ## Tests and coverage
 

@@ -6,8 +6,8 @@ namespace LeoWebApi.Persistence.Repositories;
 public interface IRocketRepository
 {
     public Rocket AddRocket(string modelName, string manufacturer, double maxThrust, long totalDeltaV);
-    public ValueTask<IReadOnlyCollection<Rocket>> GetAllRocketsAsync(bool tracking);
-    public ValueTask<Rocket?> GetRocketByIdAsync(int id, bool tracking);
+    public Task<IReadOnlyCollection<Rocket>> GetAllRocketsAsync(bool tracking);
+    public Task<Rocket?> GetRocketByIdAsync(int id, bool tracking);
     public void RemoveRocket(Rocket rocket);
 }
 
@@ -31,7 +31,7 @@ internal sealed class RocketRepository(DbSet<Rocket> rocketSet) : IRocketReposit
         return rocket;
     }
 
-    public async ValueTask<IReadOnlyCollection<Rocket>> GetAllRocketsAsync(bool tracking)
+    public async Task<IReadOnlyCollection<Rocket>> GetAllRocketsAsync(bool tracking)
     {
         IQueryable<Rocket> source = tracking ? Rockets : RocketsNoTracking;
 
@@ -40,7 +40,7 @@ internal sealed class RocketRepository(DbSet<Rocket> rocketSet) : IRocketReposit
         return rockets;
     }
 
-    public async ValueTask<Rocket?> GetRocketByIdAsync(int id, bool tracking)
+    public async Task<Rocket?> GetRocketByIdAsync(int id, bool tracking)
     {
         IQueryable<Rocket> source = tracking ? Rockets : RocketsNoTracking;
 

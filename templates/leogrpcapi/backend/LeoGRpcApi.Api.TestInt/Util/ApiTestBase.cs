@@ -44,7 +44,7 @@ public abstract class ApiTestBase<TClient> : IClassFixture<ApiTestFixture>, IAsy
         return client;
     }
 
-    protected virtual async ValueTask ImportSeedDataAsync(DatabaseContext context)
+    protected virtual async Task ImportSeedDataAsync(DatabaseContext context)
     {
         var shadow = new Ninja
         {
@@ -80,12 +80,12 @@ public abstract class ApiTestBase<TClient> : IClassFixture<ApiTestFixture>, IAsy
         await context.SaveChangesAsync(TestCancellationToken);
     }
 
-    protected async ValueTask ModifyDatabaseContentAsync(Func<DatabaseContext, ValueTask> modifier)
+    protected async Task ModifyDatabaseContentAsync(Func<DatabaseContext, Task> modifier)
     {
         await _fixture.ModifyDatabaseContentAsync(modifier);
     }
 
-    protected async ValueTask AssertExceptionStatusAsync<TResponse>(Func<Task<TResponse>> action,
+    protected async Task AssertExceptionStatusAsync<TResponse>(Func<Task<TResponse>> action,
                                                                     StatusCode expectedStatusCode,
                                                                     string? exceptionReason = null)
     {

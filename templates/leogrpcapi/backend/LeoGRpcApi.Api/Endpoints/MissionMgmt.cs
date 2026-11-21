@@ -71,15 +71,15 @@ public sealed class MissionMgmtEndpoint(
 
         OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound, IMissionService.NinjaBusy>
             assignMissionResult = await missionService.AssignMissionAsync(request.MissionId, request.NinjaId);
-        var result = await assignMissionResult.Match<ValueTask<MissionAssignmentResult>>(async success =>
+        var result = await assignMissionResult.Match<Task<MissionAssignmentResult>>(async success =>
              {
                  await transaction.CommitAsync();
 
                  return MissionAssignmentResult.Success;
              },
-             missionNotFound => ValueTask.FromResult(MissionAssignmentResult.MissionNotFound),
-             ninjaNotFound => ValueTask.FromResult(MissionAssignmentResult.NinjaNotFound),
-             ninjaBusy => ValueTask.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
+             missionNotFound => Task.FromResult(MissionAssignmentResult.MissionNotFound),
+             ninjaNotFound => Task.FromResult(MissionAssignmentResult.NinjaNotFound),
+             ninjaBusy => Task.FromResult(MissionAssignmentResult.NinjaAlreadyOnMission));
 
         return new AssignMissionResponse
         {
@@ -96,13 +96,13 @@ public sealed class MissionMgmtEndpoint(
 
         OneOf<Success, NotFound> deleteResult = await missionService.DeleteMissionAsync(request.Id);
 
-        bool result = await deleteResult.Match<ValueTask<bool>>(async success =>
+        bool result = await deleteResult.Match<Task<bool>>(async success =>
                                                                 {
                                                                     await transaction.CommitAsync();
 
                                                                     return true;
                                                                 },
-                                                                notFound => ValueTask.FromResult(false));
+                                                                notFound => Task.FromResult(false));
 
         return new DeleteMissionResponse
         {

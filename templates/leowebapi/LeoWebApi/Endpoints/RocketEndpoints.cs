@@ -31,7 +31,7 @@ public static class RocketEndpoints
         }
     }
 
-    private static async ValueTask<Results<Ok<RocketDto>, ValidationProblem, NotFound>>
+    private static async Task<Results<Ok<RocketDto>, ValidationProblem, NotFound>>
         GetRocketByIdAsync([FromRoute] int id, [FromServices] IRocketService rocketService)
     {
         if (id < 0)
@@ -48,7 +48,7 @@ public static class RocketEndpoints
                                notFound => TypedResults.NotFound());
     }
 
-    private static async ValueTask<Ok<IEnumerable<RocketDto>>> GetAllRocketsAsync(
+    private static async Task<Ok<IEnumerable<RocketDto>>> GetAllRocketsAsync(
         [FromServices] IRocketService rocketService)
     {
         IReadOnlyCollection<Rocket> rockets = await rocketService.GetAllRocketsAsync();
@@ -56,7 +56,7 @@ public static class RocketEndpoints
         return TypedResults.Ok(rockets.Select(RocketDto.FromRocket));
     }
 
-    private static async ValueTask<Results<CreatedAtRoute<RocketDto>, ValidationProblem>>
+    private static async Task<Results<CreatedAtRoute<RocketDto>, ValidationProblem>>
         AddRocketAsync([FromBody] AddRocketRequest addRequest,
                        [FromServices] IRocketService rocketService,
                        [FromServices] ITransactionProvider transaction)
@@ -80,7 +80,7 @@ public static class RocketEndpoints
         });
     }
 
-    private static async ValueTask<Results<NoContent, NotFound>> DeleteRocketAsync(
+    private static async Task<Results<NoContent, NotFound>> DeleteRocketAsync(
         [FromRoute] int id, [FromServices] IRocketService rocketService,
         [FromServices] ITransactionProvider transaction)
     {
@@ -91,7 +91,7 @@ public static class RocketEndpoints
         // the branches are local functions rather than lambdas, so that Match stays readable
         return await deleteResult.Match(OnSuccessAsync, OnNotFoundAsync);
 
-        async ValueTask<Results<NoContent, NotFound>> OnSuccessAsync(ServiceSuccess success)
+        async Task<Results<NoContent, NotFound>> OnSuccessAsync(ServiceSuccess success)
         {
             await transaction.CommitAsync();
 
@@ -99,8 +99,8 @@ public static class RocketEndpoints
         }
 
         // left uncommitted on purpose, see AddRocketAsync
-        static ValueTask<Results<NoContent, NotFound>> OnNotFoundAsync(ServiceNotFound notFound) =>
-            ValueTask.FromResult<Results<NoContent, NotFound>>(TypedResults.NotFound());
+        static Task<Results<NoContent, NotFound>> OnNotFoundAsync(ServiceNotFound notFound) =>
+            Task.FromResult<Results<NoContent, NotFound>>(TypedResults.NotFound());
     }
 }
 

@@ -31,7 +31,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                                               "An unexpected error occurred");
     }
 
-    private async ValueTask<bool> WriteProblemDetailsAsync(HttpContext httpContext, int statusCode, string title)
+    private async Task<bool> WriteProblemDetailsAsync(HttpContext httpContext, int statusCode, string title)
     {
         httpContext.Response.StatusCode = statusCode;
 

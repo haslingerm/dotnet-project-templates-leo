@@ -24,11 +24,11 @@ public static class DesignFacades
 
     public sealed class DummyNinjaService : INinjaService
     {
-        public ValueTask<IReadOnlyCollection<int>> GetAllNinjaIdsAsync() =>
-            ValueTask.FromResult<IReadOnlyCollection<int>>([1, 2]);
+        public Task<IReadOnlyCollection<int>> GetAllNinjaIdsAsync() =>
+            Task.FromResult<IReadOnlyCollection<int>>([1, 2]);
 
-        public ValueTask<NinjaDto> GetNinjaByIdAsync(int id) =>
-            ValueTask.FromResult(new NinjaDto
+        public Task<NinjaDto> GetNinjaByIdAsync(int id) =>
+            Task.FromResult(new NinjaDto
             {
                 Id = id,
                 CodeName = $"Ninja{id}",
@@ -40,8 +40,8 @@ public static class DesignFacades
 
     public sealed class DummyMissionService : IMissionService
     {
-        public ValueTask<IReadOnlyCollection<MissionDto>> GetAllMissionsAsync() =>
-            ValueTask.FromResult<IReadOnlyCollection<MissionDto>>([
+        public Task<IReadOnlyCollection<MissionDto>> GetAllMissionsAsync() =>
+            Task.FromResult<IReadOnlyCollection<MissionDto>>([
                 new MissionDto
                 {
                     Id = 1L,
@@ -57,12 +57,12 @@ public static class DesignFacades
                 }
             ]);
 
-        public ValueTask UpdateMissionAsync(long missionId, double dangerousness, string? description) =>
+        public Task UpdateMissionAsync(long missionId, double dangerousness, string? description) =>
             throw new NotImplementedException();
 
-        public ValueTask<bool> DeleteMissionAsync(long missionId) => throw new NotImplementedException();
+        public Task<bool> DeleteMissionAsync(long missionId) => throw new NotImplementedException();
 
-        public ValueTask<MissionAssignmentResult> AssignNinjaToMissionAsync(long missionId, int ninjaId) =>
+        public Task<MissionAssignmentResult> AssignNinjaToMissionAsync(long missionId, int ninjaId) =>
             throw new NotImplementedException();
     }
 

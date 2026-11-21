@@ -38,7 +38,7 @@ These instructions apply to this project. Preserve the existing layered minimal-
 - Use file-scoped namespaces, four-space indentation, primary constructors where they improve clarity, and sealed types when inheritance is not intended.
 - Do not use the null-forgiving operator (`!`) outside EF entity properties where framework materialization makes it strictly unavoidable. Prefer `required`, accurate nullable types, guards, pattern matching, or explicit exceptions. Never use `!` merely to silence analysis.
 - Use NodaTime and injected `IClock` for domain time. Keep JSON behavior in `JsonConfig`, logging structured, and secrets/configuration out of source.
-- Async methods use the `Async` suffix and do not block. Follow the established preference for explicit contract/result types and `var` only when the assigned type is obvious.
+- Async methods use the `Async` suffix and do not block. Return `Task`/`Task<T>` (runtime async is enabled); use `ValueTask` only where an external contract requires it, such as `IAsyncDisposable`, xUnit's `IAsyncLifetime`, or `IExceptionHandler`. Follow the established preference for explicit contract/result types and `var` only when the assigned type is obvious.
 
 ## Tests and coverage
 

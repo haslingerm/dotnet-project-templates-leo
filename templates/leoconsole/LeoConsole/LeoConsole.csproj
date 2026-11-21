@@ -4,6 +4,10 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net11.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- Runtime async: async methods are suspended/resumed by the runtime instead of compiler-generated
+		     state machines. Without the state machine overhead there is no reason to prefer ValueTask, so
+		     we use Task unless an external API (e.g. IAsyncDisposable) requires ValueTask. -->
+		<Features>$(Features);runtime-async=on</Features>
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>

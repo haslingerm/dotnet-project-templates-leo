@@ -8,7 +8,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     : ApiTestBase<NinjaMgmt.NinjaMgmtClient>(apiFixture)
 {
     [Fact]
-    public async ValueTask GetNinjaById_WithCurrentMission()
+    public async Task GetNinjaById_WithCurrentMission()
     {
         const int NinjaId = 1;
 
@@ -25,7 +25,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask GetNinjaById_NoCurrentMission()
+    public async Task GetNinjaById_NoCurrentMission()
     {
         const int NinjaId = 2;
 
@@ -41,7 +41,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask GetNinjaById_NotFound()
+    public async Task GetNinjaById_NotFound()
     {
         const int NinjaId = 999;
 
@@ -53,7 +53,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask GetNinjaById_Invalid()
+    public async Task GetNinjaById_Invalid()
     {
         await AssertExceptionStatusAsync(async () =>
                                              await GrpcClient.GetNinjaByIdAsync(new GetNinjaByIdRequest { Id = -1 },
@@ -63,7 +63,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask GetAllNinjas_Success()
+    public async Task GetAllNinjas_Success()
     {
         var response
             = await GrpcClient.GetAllNinjaIdsAsync(new GetAllRequest(), cancellationToken: TestCancellationToken);
@@ -72,7 +72,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
     }
 
     [Fact]
-    public async ValueTask CreateNinja_Success()
+    public async Task CreateNinja_Success()
     {
         const NinjaRank Rank = NinjaRank.Genin;
         const string CodeName = "Teppanyaki";
@@ -103,7 +103,7 @@ public sealed class NinjaTests(ApiTestFixture apiFixture)
 
     [Theory]
     [MemberData(nameof(CreateNinjaInvalidData))]
-    public async ValueTask CreateNinja_Invalid(NinjaRank rank, string codeName, IEnumerable<NinjaWeapon> weapons,
+    public async Task CreateNinja_Invalid(NinjaRank rank, string codeName, IEnumerable<NinjaWeapon> weapons,
                                                IEnumerable<string> specialSkills, string reason)
     {
         var request = new CreateNinjaRequest

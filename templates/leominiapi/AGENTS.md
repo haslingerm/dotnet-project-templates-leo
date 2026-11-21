@@ -17,7 +17,7 @@ These instructions apply to this project. Preserve its small, explicit minimal-A
 - Use file-scoped namespaces, four-space indentation, and the naming/layout already established by nearby code.
 - Never use the null-forgiving operator (`!`). This template has no EF entities, so there is no permitted exception. Model nullability accurately and use guards, pattern matching, `required`, or explicit failure paths.
 - Prefer sealed types when inheritance is not intended. Keep public surface area minimal.
-- Name asynchronous methods with `Async` and use `Task`/`ValueTask` consistently with adjacent APIs. Do not block on asynchronous work.
+- Name asynchronous methods with `Async` and return `Task`/`Task<T>` (runtime async is enabled); use `ValueTask` only where an external contract requires it, such as `IExceptionHandler` or `IAsyncDisposable`. Do not block on asynchronous work.
 - Use `IClock` and NodaTime for time-dependent behavior; do not call `DateTime.Now`, `DateTime.UtcNow`, or `SystemClock.Instance` inside application behavior.
 - Keep JSON behavior centralized in `JsonConfig`. New DTOs must respect the existing camel-case, enum, NodaTime, required-constructor, and nullable-annotation settings.
 - Return `TypedResults` and declare all normal HTTP outcomes in `Results<...>`. Validate route/body input before doing work and return the existing RFC 9457-compatible validation/problem shapes.
@@ -35,6 +35,6 @@ If database-backed writes are added, the endpoint owns the explicit transaction 
 - Keep unit and integration tests separate. If test projects are introduced, use `LeoMiniApi.Test` for unit tests and `LeoMiniApi.TestInt` for integration tests.
 - Unit tests cover pure helpers and isolated business behavior. They must not start the web host or use network, filesystem, or database infrastructure; substitute dependencies such as `IClock`.
 - Integration tests exercise the public HTTP contract through a test host, including routing, binding, serialization, status codes, and problem details. Replace nondeterministic dependencies through DI. If persistence is later added, use the real database provider in an isolated container and reset state between tests.
-- Use xUnit.net v3, AwesomeAssertions, NSubstitute, and Microsoft.Testing.Platform code coverage consistently with the larger API templates. Test projects are Microsoft.Testing.Platform executables (`<OutputType>exe</OutputType>`, no VSTest packages); when you add the first one, also add a `global.json` opting `dotnet test` into the MTP runner, as the larger templates do. Keep tests deterministic and pass `TestContext.Current.CancellationToken` to cancellable operations.
+- Use xUnit.net v3, AwesomeAssertions, NSubstitute, and coverlet.MTP code coverage consistently with the larger API templates. Test projects are Microsoft.Testing.Platform executables (`<OutputType>exe</OutputType>`, no VSTest packages); when you add the first one, also add a `global.json` opting `dotnet test` into the MTP runner, as the larger templates do. Keep tests deterministic and pass `TestContext.Current.CancellationToken` to cancellable operations.
 
 Before finishing, build the project and run every affected test project. Do not weaken analyzers, nullability, warnings-as-errors, or tests to make a change pass.

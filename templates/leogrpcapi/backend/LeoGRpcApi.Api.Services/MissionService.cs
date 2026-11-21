@@ -17,20 +17,20 @@ public interface IMissionService
     /// <param name="description">The description of the mission</param>
     /// <param name="dangerousness">The dangerousness of the mission</param>
     /// <returns></returns>
-    public ValueTask<Mission> CreateMissionAsync(string title, string? description, double dangerousness);
+    public Task<Mission> CreateMissionAsync(string title, string? description, double dangerousness);
 
     /// <summary>
     ///     Retrieves all missions, without assigned ninjas
     /// </summary>
     /// <returns>A collection of all missions</returns>
-    public ValueTask<IReadOnlyCollection<Mission>> GetAllMissionsAsync();
+    public Task<IReadOnlyCollection<Mission>> GetAllMissionsAsync();
 
     /// <summary>
     ///     Attempts to delete a mission by its ID
     /// </summary>
     /// <param name="missionId">The unique ID of the mission to delete</param>
     /// <returns>Success if the mission was found and deleted, or an information that the mission was not found</returns>
-    public ValueTask<OneOf<Success, NotFound>> DeleteMissionAsync(long missionId);
+    public Task<OneOf<Success, NotFound>> DeleteMissionAsync(long missionId);
 
     /// <summary>
     ///     Updates the description and dangerousness of a mission
@@ -39,7 +39,7 @@ public interface IMissionService
     /// <param name="description">The new description of the mission</param>
     /// <param name="dangerousness">The new dangerousness of the mission</param>
     /// <returns>A result indicating if the mission was successfully updated or not found</returns>
-    public ValueTask<OneOf<Success, NotFound>> UpdateMissionAsync(long missionId, string? description,
+    public Task<OneOf<Success, NotFound>> UpdateMissionAsync(long missionId, string? description,
                                                                   double dangerousness);
 
     /// <summary>
@@ -49,7 +49,7 @@ public interface IMissionService
     /// <param name="missionId">The unique ID of the mission</param>
     /// <param name="ninjaId">The unique ID of the ninja</param>
     /// <returns>Detailed result status indicating success or error reason</returns>
-    public ValueTask<OneOf<Success, MissionNotFound, NinjaNotFound, NinjaBusy>> AssignMissionAsync(
+    public Task<OneOf<Success, MissionNotFound, NinjaNotFound, NinjaBusy>> AssignMissionAsync(
         long missionId, int ninjaId);
 
     /// <summary>
@@ -73,7 +73,7 @@ internal sealed class MissionService(
     ILogger<MissionService> logger,
     INinjaService ninjaService) : IMissionService
 {
-    public async ValueTask<Mission> CreateMissionAsync(string title, string? description, double dangerousness)
+    public async Task<Mission> CreateMissionAsync(string title, string? description, double dangerousness)
     {
         var mission = new Mission
         {
@@ -91,14 +91,14 @@ internal sealed class MissionService(
         return mission;
     }
 
-    public async ValueTask<IReadOnlyCollection<Mission>> GetAllMissionsAsync()
+    public async Task<IReadOnlyCollection<Mission>> GetAllMissionsAsync()
     {
         IReadOnlyCollection<Mission> allMissions = await uow.MissionRepository.GetAllMissionsAsync();
 
         return allMissions;
     }
 
-    public async ValueTask<OneOf<Success, NotFound>> DeleteMissionAsync(long missionId)
+    public async Task<OneOf<Success, NotFound>> DeleteMissionAsync(long missionId)
     {
         var mission = await uow.MissionRepository.GetMissionByIdAsync(missionId);
         if (mission is null)
@@ -116,7 +116,7 @@ internal sealed class MissionService(
         return new Success();
     }
 
-    public async ValueTask<OneOf<Success, NotFound>> UpdateMissionAsync(long missionId, string? description,
+    public async Task<OneOf<Success, NotFound>> UpdateMissionAsync(long missionId, string? description,
                                                                         double dangerousness)
     {
         var mission = await uow.MissionRepository.GetMissionByIdAsync(missionId);
@@ -138,7 +138,7 @@ internal sealed class MissionService(
         return new Success();
     }
 
-    public async ValueTask<OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound,
+    public async Task<OneOf<Success, IMissionService.MissionNotFound, IMissionService.NinjaNotFound,
         IMissionService.NinjaBusy>> AssignMissionAsync(long missionId, int ninjaId)
     {
         var ninja = await GetNinjaAsync();
@@ -174,7 +174,7 @@ internal sealed class MissionService(
 
         return new Success();
 
-        async ValueTask<Ninja?> GetNinjaAsync()
+        async Task<Ninja?> GetNinjaAsync()
         {
             OneOf<Ninja, NotFound> ninjaResult = await ninjaService.GetNinjaByIdAsync(ninjaId);
 

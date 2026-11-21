@@ -20,13 +20,13 @@ public interface INinjaRepository
     /// </summary>
     /// <param name="id">The unique ID of the ninja</param>
     /// <returns>The ninja, if found</returns>
-    public ValueTask<Ninja?> GetNinjaByIdAsync(int id);
+    public Task<Ninja?> GetNinjaByIdAsync(int id);
 
     /// <summary>
     ///     Retrieves all ninja IDs from the repository
     /// </summary>
     /// <returns>Collection of all unique ninja IDs</returns>
-    public ValueTask<IReadOnlyCollection<int>> GetAllNinjaIdsAsync();
+    public Task<IReadOnlyCollection<int>> GetAllNinjaIdsAsync();
 }
 
 internal sealed class NinjaRepository(DbSet<Ninja> ninjas) : INinjaRepository
@@ -36,7 +36,7 @@ internal sealed class NinjaRepository(DbSet<Ninja> ninjas) : INinjaRepository
         ninjas.Add(ninja);
     }
 
-    public async ValueTask<Ninja?> GetNinjaByIdAsync(int id)
+    public async Task<Ninja?> GetNinjaByIdAsync(int id)
     {
         IIncludableQueryable<Ninja, Mission?> query = ninjas.Include(n => n.CurrentMission);
         var ninja = await query.FirstOrDefaultAsync(n => n.Id == id);
@@ -44,7 +44,7 @@ internal sealed class NinjaRepository(DbSet<Ninja> ninjas) : INinjaRepository
         return ninja;
     }
 
-    public async ValueTask<IReadOnlyCollection<int>> GetAllNinjaIdsAsync()
+    public async Task<IReadOnlyCollection<int>> GetAllNinjaIdsAsync()
     {
         IOrderedQueryable<int> query = ninjas.Select(n => n.Id)
                                              .Order();

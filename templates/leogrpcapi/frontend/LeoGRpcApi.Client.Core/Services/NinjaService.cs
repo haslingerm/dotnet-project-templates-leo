@@ -13,7 +13,7 @@ public interface INinjaService
     ///     Gets all ninja IDs
     /// </summary>
     /// <returns>Collection of all ninja IDs</returns>
-    public ValueTask<IReadOnlyCollection<int>> GetAllNinjaIdsAsync();
+    public Task<IReadOnlyCollection<int>> GetAllNinjaIdsAsync();
 
     /// <summary>
     ///     Retrieves a ninja by its ID.
@@ -21,13 +21,13 @@ public interface INinjaService
     /// </summary>
     /// <param name="id">Unique ID of the ninja</param>
     /// <returns>The ninja DTO</returns>
-    public ValueTask<NinjaDto> GetNinjaByIdAsync(int id);
+    public Task<NinjaDto> GetNinjaByIdAsync(int id);
 }
 
 internal sealed class NinjaService(GrpcClientFactory clientFactory)
     : ServiceBase<NinjaMgmt.NinjaMgmtClient>(clientFactory), INinjaService
 {
-    public async ValueTask<IReadOnlyCollection<int>> GetAllNinjaIdsAsync()
+    public async Task<IReadOnlyCollection<int>> GetAllNinjaIdsAsync()
     {
         var request = new GetAllRequest();
         var response = await ApiClient.GetAllNinjaIdsAsync(request);
@@ -35,7 +35,7 @@ internal sealed class NinjaService(GrpcClientFactory clientFactory)
         return response.NinjaIds.ToList();
     }
 
-    public async ValueTask<NinjaDto> GetNinjaByIdAsync(int id)
+    public async Task<NinjaDto> GetNinjaByIdAsync(int id)
     {
         var request = new GetNinjaByIdRequest { Id = id };
         ThrowIfInvalid<GetNinjaByIdRequest, GetNinjaByIdRequestValidator>(request);

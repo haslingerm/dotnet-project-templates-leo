@@ -10,7 +10,7 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
     // Note: make sure you have created a migration before running the tests!
 
     [Fact]
-    public async ValueTask GetAllRockets_ExistingRockets_Success()
+    public async Task GetAllRockets_ExistingRockets_Success()
     {
         const string Manufacturer1 = "Blue Origin";
         const string ModelName1 = "New Shepard";
@@ -49,7 +49,7 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
     }
 
     [Fact]
-    public async ValueTask AddRocket_Success()
+    public async Task AddRocket_Success()
     {
         const string Manufacturer = "NASA";
         const string ModelName = "Saturn V";
@@ -91,7 +91,7 @@ public sealed class RocketTests(WebApiTestFixture webApiFixture) : WebApiTestBas
     }
 
     [Fact]
-    public async ValueTask AddRocket_InvalidRequest()
+    public async Task AddRocket_InvalidRequest()
     {
         var response = await ApiClient.PostAsJsonAsync("api/rockets", new AddRocketRequest
         {

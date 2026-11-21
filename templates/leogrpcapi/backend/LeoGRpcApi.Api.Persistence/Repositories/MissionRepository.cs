@@ -20,7 +20,7 @@ public interface IMissionRepository
     /// </summary>
     /// <param name="id">Unique ID of the mission</param>
     /// <returns>The mission, if found</returns>
-    public ValueTask<Mission?> GetMissionByIdAsync(long id);
+    public Task<Mission?> GetMissionByIdAsync(long id);
 
     /// <summary>
     ///     Removes a mission from the repository
@@ -32,7 +32,7 @@ public interface IMissionRepository
     ///     Retrieves all missions from the repository, without assigned ninjas and not tracking changes
     /// </summary>
     /// <returns>Collection of all missions</returns>
-    public ValueTask<IReadOnlyCollection<Mission>> GetAllMissionsAsync();
+    public Task<IReadOnlyCollection<Mission>> GetAllMissionsAsync();
 }
 
 internal sealed class MissionRepository(DbSet<Mission> missions) : IMissionRepository
@@ -42,7 +42,7 @@ internal sealed class MissionRepository(DbSet<Mission> missions) : IMissionRepos
         missions.Add(mission);
     }
 
-    public async ValueTask<Mission?> GetMissionByIdAsync(long id)
+    public async Task<Mission?> GetMissionByIdAsync(long id)
     {
         IIncludableQueryable<Mission, List<Ninja>> query = missions
             .Include(m => m.AssignedNinjas);
@@ -56,7 +56,7 @@ internal sealed class MissionRepository(DbSet<Mission> missions) : IMissionRepos
         missions.Remove(mission);
     }
 
-    public async ValueTask<IReadOnlyCollection<Mission>> GetAllMissionsAsync()
+    public async Task<IReadOnlyCollection<Mission>> GetAllMissionsAsync()
     {
         List<Mission> allMissions = await missions.AsNoTracking().ToListAsync();
 

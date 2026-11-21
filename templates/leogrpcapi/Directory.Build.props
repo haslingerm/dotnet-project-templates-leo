@@ -7,6 +7,10 @@
         <AnalysisLevel>latest</AnalysisLevel>
         <NuGetAudit>true</NuGetAudit>
         <ImplicitUsings>enable</ImplicitUsings>
+        <!-- Runtime async: async methods are suspended/resumed by the runtime instead of compiler-generated
+             state machines. Without the state machine overhead there is no reason to prefer ValueTask, so
+             we use Task unless an external API (e.g. IAsyncDisposable) requires ValueTask. -->
+        <Features>$(Features);runtime-async=on</Features>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="NodaTime" Version="3.3.7"/>

@@ -7,9 +7,9 @@ namespace LeoWebApi.Persistence.Util;
 
 public interface ITransactionProvider : IAsyncDisposable, IDisposable
 {
-    public ValueTask BeginTransactionAsync();
-    public ValueTask CommitAsync();
-    public ValueTask RollbackAsync();
+    public Task BeginTransactionAsync();
+    public Task CommitAsync();
+    public Task RollbackAsync();
 }
 
 public interface IUnitOfWork
@@ -25,7 +25,7 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
     
     public IRocketRepository RocketRepository => new RocketRepository(context.Rockets);
 
-    public async ValueTask BeginTransactionAsync()
+    public async Task BeginTransactionAsync()
     {
         if (_transaction is not null)
         {
@@ -35,7 +35,7 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
         _transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Snapshot);
     }
 
-    public async ValueTask CommitAsync()
+    public async Task CommitAsync()
     {
         if (_transaction is null)
         {
@@ -46,7 +46,7 @@ internal sealed class UnitOfWork(DatabaseContext context, ILogger<UnitOfWork> lo
         _transaction = null;
     }
 
-    public async ValueTask RollbackAsync()
+    public async Task RollbackAsync()
     {
         if (_transaction is null)
         {
